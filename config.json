@@ -1,0 +1,6 @@
+{
+	"MaxWorkers": 4,
+	"Seeds": [
+		"https://en.wikipedia.org/wiki/Chaos_Theory"
+	]
+}

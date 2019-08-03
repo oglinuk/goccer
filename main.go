@@ -2,8 +2,15 @@ package main
 
 import (
 	"log"
+
+	"./utils"
 )
 
 func main() {
-	log.Println("Hello from Go!")
+	cfg, err := utils.LoadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(cfg)
 }
