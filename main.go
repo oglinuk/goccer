@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-
+	"./hive"
 	"./utils"
 )
 
@@ -12,5 +11,8 @@ func main() {
 		panic(err)
 	}
 
-	log.Println(cfg)
+	for _, seed := range cfg.Seeds {
+		q := hive.NewQueen(seed)
+		q.SpawnDrone()
+	}
 }
