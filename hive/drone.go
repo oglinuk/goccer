@@ -9,6 +9,7 @@ import (
 
 func (q *Queen) SpawnDrone() {
 	q.crawl()
+	q.rw.Aggregate()
 }
 
 func (q *Queen) crawl() error {
@@ -31,8 +32,9 @@ func (q *Queen) crawl() error {
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		for i, URL := range q.Extract(resp) {
-			log.Printf("[%d]Extracted: %s", i, URL)
+		q.pw.Write(q.seed)
+		for _, URL := range q.Extract(resp) {
+			q.rw.Write(URL)
 		}
 	} else {
 		log.Printf("Request failed: %s", q.seed)
