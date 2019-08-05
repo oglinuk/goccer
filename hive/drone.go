@@ -31,7 +31,9 @@ func (q *Queen) crawl() error {
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		log.Printf("Request success: %s", q.seed)
+		for i, URL := range q.Extract(resp) {
+			log.Printf("[%d]Extracted: %s", i, URL)
+		}
 	} else {
 		log.Printf("Request failed: %s", q.seed)
 	}
