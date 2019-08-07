@@ -22,7 +22,7 @@ type URLWriter struct {
 func NewURLFile(fPath string) *URLFile {
 	file, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Printf("os.OpenFile NewUrlFile err: %s", err.Error())
+		log.Printf("os.OpenFile (NewUrlFile) err: %s", err.Error())
 	}
 	return &URLFile{
 		file:       file,
@@ -33,7 +33,7 @@ func NewURLFile(fPath string) *URLFile {
 func NewURLWriter(dPath string) *URLWriter {
 	err := os.MkdirAll(dPath, 0777)
 	if err != nil {
-		log.Printf("os.MkdirAll NewUrlWriter err: %s", err.Error())
+		log.Printf("os.MkdirAll (NewUrlWriter) err: %s", err.Error())
 	}
 	return &URLWriter{
 		path:     dPath,
@@ -70,38 +70,25 @@ func (uw *URLWriter) Write(URL string) error {
 	return nil
 }
 
-func (uw *URLWriter) Aggregate() {
+func (q *Queen) Aggregate() {
 	check := make(map[string]struct{})
-	//var uncrawled []string
 
-	f, err := os.OpenFile("to_crawl.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
-	if err != nil {
-		log.Printf("os.OpenFile NewUrlFile err: %s", err.Error())
-	}
-
-	for k := range uw.urlFiles {
-		fileDir := filepath.Join(uw.path, k)
+	for k := range q.rw.urlFiles {
+		fileDir := filepath.Join(q.rw.path, k)
 
 		fd, err := os.Open(fileDir)
 		if err != nil {
-			log.Printf("os.Open Aggregate err: %s", err.Error())
+			log.Printf("os.Open (Aggregate) err: %s", err.Error())
 		}
-		defer fd.Close()
 
 		scanner := bufio.NewScanner(fd)
 		for scanner.Scan() {
 			scanned := scanner.Text()
 			if _, exists := check[scanned]; !exists {
 				check[scanned] = struct{}{}
-				f.WriteString(fmt.Sprintf("%s\n", scanned))
-				//uncrawled = append(uncrawled, scanner.Text())
+				q.aw.file.WriteString(fmt.Sprintf("%s\n", scanned))
 			}
 		}
+		fd.Close()
 	}
-	/*
-		utils.SaveConfig(&utils.Config{
-			MaxWorkers: 4,
-			Seeds:      uncrawled,
-		})
-	*/
 }

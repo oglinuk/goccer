@@ -8,8 +8,9 @@ import (
 )
 
 func (q *Queen) SpawnDrone() {
-	q.crawl()
-	q.rw.Aggregate()
+	if err := q.crawl(); err != nil {
+		log.Printf("Crawl err: %s", err)
+	}
 }
 
 func (q *Queen) crawl() error {

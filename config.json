@@ -1,6 +1,7 @@
 {
 	"MaxWorkers": 4,
 	"Seeds": [
-		"https://en.wikipedia.org/wiki/Chaos_Theory"
+		"https://en.wikipedia.org/wiki/Chaos_Theory",
+		"https://en.wikipedia.org/wiki/Machine_Learning"
 	]
 }

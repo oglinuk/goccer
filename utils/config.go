@@ -40,6 +40,7 @@ func LoadConfig() (Config, error) {
 			MaxWorkers: 4,
 			Seeds: []string{
 				"https://en.wikipedia.org/wiki/Chaos_Theory",
+				"https://en.wikipedia.org/wiki/Machine_Learning",
 			},
 		})
 		return cf, err
@@ -60,14 +61,12 @@ func AggregateConfig() error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	fname := fmt.Sprintf("%d.txt", time.Now().Unix())
 	ucf, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		panic(err)
 	}
-	defer f.Close()
 
 	log.Println("Processing aggregation ...")
 	scanner := bufio.NewScanner(f)
@@ -81,7 +80,10 @@ func AggregateConfig() error {
 		}
 	}
 
-	err = SaveConfig(&Config{Seeds: uncrawled})
+	err = SaveConfig(&Config{
+		MaxWorkers: 4,
+		Seeds:      uncrawled,
+	})
 
 	if err != nil {
 		return err
@@ -91,6 +93,9 @@ func AggregateConfig() error {
 	if err != nil {
 		return err
 	}
+
+	f.Close()
+	ucf.Close()
 
 	log.Println("Finished aggregation ...")
 
