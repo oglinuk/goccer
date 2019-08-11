@@ -10,6 +10,7 @@ import (
 func (q *Queen) SpawnDrone() {
 	if err := q.crawl(); err != nil {
 		log.Printf("Crawl err: %s", err)
+		q.ew.Write(q.seed)
 	}
 }
 
@@ -29,7 +30,7 @@ func (q *Queen) crawl() error {
 	}
 
 	if resp == nil {
-		return nil
+		return err
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
@@ -38,7 +39,7 @@ func (q *Queen) crawl() error {
 			q.rw.Write(URL)
 		}
 	} else {
-		log.Printf("Request failed: %s", q.seed)
+		return err
 	}
 
 	return nil

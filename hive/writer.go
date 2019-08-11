@@ -67,6 +67,8 @@ func (uw *URLWriter) Write(URL string) error {
 	uf.file.WriteString(fmt.Sprintf("%s\n", decoded))
 	uf.hasWritten = true
 
+	uf.file.Close()
+
 	return nil
 }
 

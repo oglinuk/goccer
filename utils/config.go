@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -57,23 +58,25 @@ func AggregateConfig() error {
 	check := make(map[string]struct{})
 	var uncrawled []string
 
-	f, err := os.Open("to_crawl.txt")
+	file, err := os.Open("to_crawl.txt")
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	fname := fmt.Sprintf("%d.txt", time.Now().Unix())
-	ucf, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	ucFile, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		panic(err)
 	}
+	defer file.Close()
 
 	log.Println("Processing aggregation ...")
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		scanned := scanner.Text()
 
-		ucf.WriteString(fmt.Sprintf("%s\n", scanned))
+		ucFile.WriteString(fmt.Sprintf("%s\n", scanned))
 		if _, exists := check[scanned]; !exists {
 			check[scanned] = struct{}{}
 			uncrawled = append(uncrawled, scanned)
@@ -81,7 +84,7 @@ func AggregateConfig() error {
 	}
 
 	err = SaveConfig(&Config{
-		MaxWorkers: 4,
+		MaxWorkers: runtime.GOMAXPROCS(0),
 		Seeds:      uncrawled,
 	})
 
@@ -94,10 +97,8 @@ func AggregateConfig() error {
 		return err
 	}
 
-	f.Close()
-	ucf.Close()
-
 	log.Println("Finished aggregation ...")
 
 	return nil
+
 }
