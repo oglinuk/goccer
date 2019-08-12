@@ -10,8 +10,8 @@ import (
 )
 
 type URLFile struct {
-	file       *os.File
-	hasWritten bool
+	file *os.File
+	urls map[string]struct{}
 }
 
 type URLWriter struct {
@@ -25,8 +25,8 @@ func NewURLFile(fPath string) *URLFile {
 		log.Printf("os.OpenFile (NewUrlFile) err: %s", err.Error())
 	}
 	return &URLFile{
-		file:       file,
-		hasWritten: false,
+		file: file,
+		urls: make(map[string]struct{}),
 	}
 }
 
@@ -64,8 +64,10 @@ func (uw *URLWriter) Write(URL string) error {
 		return err
 	}
 
-	uf.file.WriteString(fmt.Sprintf("%s\n", decoded))
-	uf.hasWritten = true
+	if _, exists := uf.urls[decoded]; !exists {
+		uf.file.WriteString(fmt.Sprintf("%s\n", decoded))
+		uf.urls[decoded] = struct{}{}
+	}
 
 	uf.file.Close()
 
@@ -73,8 +75,6 @@ func (uw *URLWriter) Write(URL string) error {
 }
 
 func (q *Queen) Aggregate() {
-	check := make(map[string]struct{})
-
 	for k := range q.rw.urlFiles {
 		fileDir := filepath.Join(q.rw.path, k)
 
@@ -86,10 +86,7 @@ func (q *Queen) Aggregate() {
 		scanner := bufio.NewScanner(fd)
 		for scanner.Scan() {
 			scanned := scanner.Text()
-			if _, exists := check[scanned]; !exists {
-				check[scanned] = struct{}{}
-				q.aw.file.WriteString(fmt.Sprintf("%s\n", scanned))
-			}
+			q.aw.file.WriteString(fmt.Sprintf("%s\n", scanned))
 		}
 		fd.Close()
 	}

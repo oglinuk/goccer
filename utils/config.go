@@ -55,7 +55,6 @@ func LoadConfig() (Config, error) {
 }
 
 func AggregateConfig() error {
-	check := make(map[string]struct{})
 	var uncrawled []string
 
 	file, err := os.Open("to_crawl.txt")
@@ -77,10 +76,7 @@ func AggregateConfig() error {
 		scanned := scanner.Text()
 
 		ucFile.WriteString(fmt.Sprintf("%s\n", scanned))
-		if _, exists := check[scanned]; !exists {
-			check[scanned] = struct{}{}
-			uncrawled = append(uncrawled, scanned)
-		}
+		uncrawled = append(uncrawled, scanned)
 	}
 
 	err = SaveConfig(&Config{
