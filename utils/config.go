@@ -1,13 +1,9 @@
 package utils
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
-	"log"
 	"os"
 	"runtime"
-	"time"
 )
 
 const (
@@ -52,49 +48,4 @@ func LoadConfig() (Config, error) {
 	err = decoder.Decode(&cf)
 
 	return cf, err
-}
-
-func AggregateConfig() error {
-	var uncrawled []string
-
-	file, err := os.Open("to_crawl.txt")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	fname := fmt.Sprintf("%d.txt", time.Now().Unix())
-	ucFile, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	log.Println("Processing aggregation ...")
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		scanned := scanner.Text()
-
-		ucFile.WriteString(fmt.Sprintf("%s\n", scanned))
-		uncrawled = append(uncrawled, scanned)
-	}
-
-	err = SaveConfig(&Config{
-		MaxWorkers: runtime.GOMAXPROCS(0),
-		Seeds:      uncrawled,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	err = os.RemoveAll("to_crawl.txt")
-	if err != nil {
-		return err
-	}
-
-	log.Println("Finished aggregation ...")
-
-	return nil
-
 }

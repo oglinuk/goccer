@@ -47,5 +47,5 @@ func main() {
 
 	wg.Wait()
 	close(jobs)
-	utils.AggregateConfig()
+	utils.Archive()
 }
