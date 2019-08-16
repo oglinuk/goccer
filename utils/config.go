@@ -38,7 +38,7 @@ func LoadConfig() (Config, error) {
 	f, err := os.Open(configName)
 	if err != nil {
 		SaveConfig(&Config{
-			MaxWorkers: 4,
+			MaxWorkers: runtime.GOMAXPROCS(0),
 			Seeds: []string{
 				"https://en.wikipedia.org/wiki/Chaos_Theory",
 				"https://en.wikipedia.org/wiki/Machine_Learning",
