@@ -10,23 +10,26 @@ import (
 	"time"
 )
 
+var (
+	ArchiveFile = fmt.Sprintf("%d", time.Now().Unix())
+)
+
 func Archive() error {
 	var uncrawled []string
 
-	file, err := os.Open("to_crawl.txt")
+	file, err := os.Open(ArchiveFile)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	fname := fmt.Sprintf("%d", time.Now().Unix())
-	af, err := createArchive(fname)
+	af, err := createArchive(ArchiveFile)
 	if err != nil {
 		return err
 	}
 	defer af.Close()
 
-	aw, err := af.Create(fmt.Sprintf("%s.txt", fname))
+	aw, err := af.Create(fmt.Sprintf("%s.txt", ArchiveFile))
 	if err != nil {
 		return err
 	}
@@ -49,7 +52,7 @@ func Archive() error {
 		return err
 	}
 
-	err = os.RemoveAll("to_crawl.txt")
+	err = os.RemoveAll(ArchiveFile)
 	if err != nil {
 		return err
 	}

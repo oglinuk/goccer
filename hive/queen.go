@@ -8,12 +8,12 @@ type Queen struct {
 	aw   *URLFile
 }
 
-func NewQueen(URL string) *Queen {
+func NewQueen(URL, af string) *Queen {
 	return &Queen{
 		seed: URL,
 		pw:   NewURLWriter("crawled"),
 		rw:   NewURLWriter("uncrawled"),
 		ew:   NewURLWriter("errors"),
-		aw:   NewURLFile("to_crawl.txt"),
+		aw:   NewURLFile(af),
 	}
 }

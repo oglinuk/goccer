@@ -17,7 +17,7 @@ func Consumer(jobs <-chan Job, wg *sync.WaitGroup) {
 			if !ok {
 				return
 			}
-			q := hive.NewQueen(job.URL)
+			q := hive.NewQueen(job.URL, ArchiveFile)
 			q.SpawnDrone()
 			q.Aggregate()
 			wg.Done()
