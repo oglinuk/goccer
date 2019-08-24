@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (q *Queen) Extract(resp *http.Response) []string {
+func (q *Queen) extract(resp *http.Response) []string {
 	if resp == nil {
 		return nil
 	}

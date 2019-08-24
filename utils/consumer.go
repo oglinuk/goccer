@@ -10,7 +10,7 @@ type Job struct {
 	URL string
 }
 
-func Consumer(jobs <-chan Job, wg *sync.WaitGroup) {
+func consume(jobs <-chan Job, wg *sync.WaitGroup) {
 	for {
 		select {
 		case job, ok := <-jobs:
@@ -18,8 +18,8 @@ func Consumer(jobs <-chan Job, wg *sync.WaitGroup) {
 				return
 			}
 			q := hive.NewQueen(job.URL, ArchiveFile)
-			q.SpawnDrone()
-			q.Aggregate()
+			q.spawnDrone()
+			q.aggregate()
 			wg.Done()
 		}
 	}

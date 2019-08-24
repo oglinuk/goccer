@@ -10,7 +10,7 @@ func InitProducer(cfg Config) {
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= cfg.MaxWorkers; i++ {
-		go Consumer(jobs, wg)
+		go consume(jobs, wg)
 	}
 
 	for i, seed := range cfg.Seeds {

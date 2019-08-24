@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-func (q *Queen) SpawnDrone() {
+func (q *Queen) spawnDrone() {
 	if err := q.crawl(); err != nil {
-		log.Printf("Crawl err: %s", err)
-		q.ew.Write(q.seed)
+		log.Printf("crawl err: %s", err)
+		q.ew.write(q.seed)
 	}
 }
 
@@ -21,7 +21,7 @@ func (q *Queen) crawl() error {
 				InsecureSkipVerify: true,
 			},
 		},
-		Timeout: time.Second * 5,
+		Timeout: time.Second * 30,
 	}
 
 	resp, err := client.Get(q.seed)
@@ -34,9 +34,9 @@ func (q *Queen) crawl() error {
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		q.pw.Write(q.seed)
-		for _, URL := range q.Extract(resp) {
-			q.rw.Write(URL)
+		q.pw.write(q.seed)
+		for _, URL := range q.extract(resp) {
+			q.rw.write(URL)
 		}
 	} else {
 		return err

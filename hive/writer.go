@@ -19,10 +19,10 @@ type URLWriter struct {
 	urlFiles map[string]*URLFile
 }
 
-func NewURLFile(fPath string) *URLFile {
+func newURLFile(fPath string) *URLFile {
 	file, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Printf("os.OpenFile (NewUrlFile) err: %s", err.Error())
+		log.Printf("os.OpenFile (newUrlFile) err: %s", err.Error())
 	}
 	return &URLFile{
 		file: file,
@@ -30,10 +30,10 @@ func NewURLFile(fPath string) *URLFile {
 	}
 }
 
-func NewURLWriter(dPath string) *URLWriter {
+func newURLWriter(dPath string) *URLWriter {
 	err := os.MkdirAll(dPath, 0777)
 	if err != nil {
-		log.Printf("os.MkdirAll (NewUrlWriter) err: %s", err.Error())
+		log.Printf("os.MkdirAll (newUrlWriter) err: %s", err.Error())
 	}
 	return &URLWriter{
 		path:     dPath,
@@ -41,7 +41,7 @@ func NewURLWriter(dPath string) *URLWriter {
 	}
 }
 
-func (uw *URLWriter) Write(URL string) error {
+func (uw *URLWriter) write(URL string) error {
 	u, err := url.Parse(URL)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (uw *URLWriter) Write(URL string) error {
 	fileDir := filepath.Join(uw.path, base)
 
 	if _, ok := uw.urlFiles[base]; !ok {
-		uw.urlFiles[base] = NewURLFile(fileDir)
+		uw.urlFiles[base] = newURLFile(fileDir)
 	}
 
 	uf := uw.urlFiles[base]
@@ -74,13 +74,13 @@ func (uw *URLWriter) Write(URL string) error {
 	return nil
 }
 
-func (q *Queen) Aggregate() {
+func (q *Queen) aggregate() {
 	for k := range q.rw.urlFiles {
 		fileDir := filepath.Join(q.rw.path, k)
 
 		fd, err := os.Open(fileDir)
 		if err != nil {
-			log.Printf("os.Open (Aggregate) err: %s", err.Error())
+			log.Printf("os.Open (aggregate) err: %s", err.Error())
 		}
 
 		scanner := bufio.NewScanner(fd)
