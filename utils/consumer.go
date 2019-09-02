@@ -18,8 +18,8 @@ func consume(jobs <-chan Job, wg *sync.WaitGroup) {
 				return
 			}
 			q := hive.NewQueen(job.URL, ArchiveFile)
-			q.spawnDrone()
-			q.aggregate()
+			q.SpawnDrone()
+			q.Aggregate()
 			wg.Done()
 		}
 	}
