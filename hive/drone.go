@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (q *Queen) spawnDrone() {
+func (q *Queen) SpawnDrone() {
 	if err := q.crawl(); err != nil {
 		log.Printf("crawl err: %s", err)
 		q.ew.write(q.seed)

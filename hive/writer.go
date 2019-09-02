@@ -74,13 +74,13 @@ func (uw *URLWriter) write(URL string) error {
 	return nil
 }
 
-func (q *Queen) aggregate() {
+func (q *Queen) Aggregate() {
 	for k := range q.rw.urlFiles {
 		fileDir := filepath.Join(q.rw.path, k)
 
 		fd, err := os.Open(fileDir)
 		if err != nil {
-			log.Printf("os.Open (aggregate) err: %s", err.Error())
+			log.Printf("os.Open (Aggregate) err: %s", err.Error())
 		}
 
 		scanner := bufio.NewScanner(fd)
