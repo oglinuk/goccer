@@ -26,7 +26,7 @@ func NewLocalStore(l string) *LocalStore {
 }
 
 func (ls *LocalStore) Archive() error {
-	if err := localArchive(ls.location); err != nil {
+	if err := localArchive(ls.Location); err != nil {
 		return err
 	}
 
