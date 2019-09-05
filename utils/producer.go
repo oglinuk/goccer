@@ -5,12 +5,12 @@ import (
 	"sync"
 )
 
-func InitProducer(cfg Config) {
+func InitProducer(cfg Config, store string) {
 	jobs := make(chan Job)
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= cfg.MaxWorkers; i++ {
-		go consume(jobs, wg)
+		go consume(jobs, wg, store)
 	}
 
 	for i, seed := range cfg.Seeds {

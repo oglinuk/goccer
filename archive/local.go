@@ -1,4 +1,4 @@
-package utils
+package archive
 
 import (
 	"archive/zip"
@@ -7,29 +7,48 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"time"
+
+	"github.com/OGLinuk/goccer/utils"
 )
 
 var (
-	ArchiveFile = fmt.Sprintf("%d", time.Now().Unix())
+	_ ArchiveStore = (*LocalStore)(nil)
 )
 
-func Archive() error {
+type LocalStore struct {
+	Location string
+}
+
+func NewLocalStore(l string) *LocalStore {
+	return &LocalStore{
+		Location: l,
+	}
+}
+
+func (ls *LocalStore) Archive() error {
+	if err := localArchive(ls.location); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func localArchive(archiveFile string) error {
 	var uncrawled []string
 
-	file, err := os.Open(ArchiveFile)
+	file, err := os.Open(archiveFile)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	af, err := createArchive(ArchiveFile)
+	af, err := createArchive(archiveFile)
 	if err != nil {
 		return err
 	}
 	defer af.Close()
 
-	aw, err := af.Create(fmt.Sprintf("%s.txt", ArchiveFile))
+	aw, err := af.Create(fmt.Sprintf("%s.txt", archiveFile))
 	if err != nil {
 		return err
 	}
@@ -43,7 +62,7 @@ func Archive() error {
 		uncrawled = append(uncrawled, scanned)
 	}
 
-	err = SaveConfig(&Config{
+	err = utils.SaveConfig(&utils.Config{
 		MaxWorkers: runtime.GOMAXPROCS(0),
 		Seeds:      uncrawled,
 	})
@@ -52,13 +71,12 @@ func Archive() error {
 		return err
 	}
 
-	err = os.RemoveAll(ArchiveFile)
+	err = os.RemoveAll(archiveFile)
 	if err != nil {
 		return err
 	}
 
-	log.Println("Finished archival ...")
-
+	log.Println("Finished local archival ...")
 	return nil
 }
 
