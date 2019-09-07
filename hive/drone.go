@@ -1,9 +1,13 @@
 package hive
 
 import (
+	"bufio"
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -11,6 +15,22 @@ func (q *Queen) SpawnDrone() {
 	if err := q.crawl(); err != nil {
 		log.Printf("crawl err: %s", err)
 		q.ew.write(q.seed)
+	}
+
+	for k := range q.rw.urlFiles {
+		fileDir := filepath.Join(q.rw.path, k)
+
+		fd, err := os.Open(fileDir)
+		if err != nil {
+			log.Printf("os.Open (Aggregate) err: %s", err.Error())
+		}
+
+		scanner := bufio.NewScanner(fd)
+		for scanner.Scan() {
+			scanned := scanner.Text()
+			q.aw.file.WriteString(fmt.Sprintf("%s\n", scanned))
+		}
+		fd.Close()
 	}
 }
 

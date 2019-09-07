@@ -1,7 +1,6 @@
 package hive
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"net/url"
@@ -72,22 +71,4 @@ func (uw *URLWriter) write(URL string) error {
 	uf.file.Close()
 
 	return nil
-}
-
-func (q *Queen) Aggregate() {
-	for k := range q.rw.urlFiles {
-		fileDir := filepath.Join(q.rw.path, k)
-
-		fd, err := os.Open(fileDir)
-		if err != nil {
-			log.Printf("os.Open (Aggregate) err: %s", err.Error())
-		}
-
-		scanner := bufio.NewScanner(fd)
-		for scanner.Scan() {
-			scanned := scanner.Text()
-			q.aw.file.WriteString(fmt.Sprintf("%s\n", scanned))
-		}
-		fd.Close()
-	}
 }
