@@ -10,26 +10,32 @@ import (
 	"time"
 )
 
-var (
-	ArchiveFile = fmt.Sprintf("%d", time.Now().Unix())
-)
+type Archiver struct {
+	ArchiveFile string
+}
 
-func Archive() error {
+func NewArchiver() *Archiver {
+	return &Archiver{
+		ArchiveFile: fmt.Sprintf("%d", time.Now().Unix()),
+	}
+}
+
+func (a *Archiver) Archive() error {
 	var uncrawled []string
 
-	file, err := os.Open(ArchiveFile)
+	file, err := os.Open(a.ArchiveFile)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	af, err := createArchive(ArchiveFile)
+	af, err := a.createArchive(a.ArchiveFile)
 	if err != nil {
 		return err
 	}
 	defer af.Close()
 
-	aw, err := af.Create(fmt.Sprintf("%s.txt", ArchiveFile))
+	aw, err := af.Create(fmt.Sprintf("%s.txt", a.ArchiveFile))
 	if err != nil {
 		return err
 	}
@@ -52,7 +58,7 @@ func Archive() error {
 		return err
 	}
 
-	err = os.RemoveAll(ArchiveFile)
+	err = os.RemoveAll(a.ArchiveFile)
 	if err != nil {
 		return err
 	}
@@ -62,7 +68,7 @@ func Archive() error {
 	return nil
 }
 
-func createArchive(archiveName string) (*zip.Writer, error) {
+func (a *Archiver) createArchive(archiveName string) (*zip.Writer, error) {
 	af, err := os.Create(fmt.Sprintf("%s.zip", archiveName))
 	if err != nil {
 		return nil, err

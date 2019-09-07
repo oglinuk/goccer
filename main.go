@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"./conducer"
 	"./utils"
 )
 
@@ -12,8 +13,12 @@ func main() {
 	cfg, err := utils.LoadConfig()
 	if err != nil {
 		log.Printf("LoadConfig err: %v", err)
+		return
 	}
 
-	utils.InitProducer(cfg)
-	utils.Archive()
+	archiver := utils.NewArchiver()
+
+	conducer.InitProducer(cfg.MaxWorkers, cfg.Seeds, archiver.ArchiveFile)
+
+	archiver.Archive()
 }
