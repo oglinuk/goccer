@@ -16,7 +16,7 @@ type Archiver struct {
 
 func NewArchiver() *Archiver {
 	return &Archiver{
-		ArchiveFile: fmt.Sprintf("%d", time.Now().Unix()),
+		ArchiveFile: fmt.Sprintf("data/%d", time.Now().Unix()),
 	}
 }
 

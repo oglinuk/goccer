@@ -11,9 +11,9 @@ type Queen struct {
 func NewQueen(URL, af string) *Queen {
 	return &Queen{
 		seed: URL,
-		pw:   newURLWriter("crawled"),
-		rw:   newURLWriter("uncrawled"),
-		ew:   newURLWriter("errors"),
+		pw:   newURLWriter("data/crawled"),
+		rw:   newURLWriter("data/uncrawled"),
+		ew:   newURLWriter("data/errors"),
 		aw:   newURLFile(af),
 	}
 }
