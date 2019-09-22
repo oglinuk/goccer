@@ -22,6 +22,7 @@
 ## Todo
 - Abstract archival to allow for different datastores
 - Implement xstore backend for archival
+- Add option to configure the compression of the archive
 - Add ability to filter when crawling
 - Parse and seperate crawl errors
 - Create a queue system
