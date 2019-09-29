@@ -1,4 +1,4 @@
-# (Go) (C)on(c)urrent Web Crawl(er)
+# (Go) (C)on(c)urrent Crawl(er)
 
 ## How to use
 
@@ -20,10 +20,12 @@
 ```./main -s https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
-- Abstract archival to allow for different datastores
-- Implement xstore backend for archival
-- Add option to configure the compression of the archive
-- Add ability to filter when crawling
-- Parse and seperate crawl errors
-- Create a queue system
-- Dockerize
+* [ ] Crawl a device directory
+* [ ] Abstract archival to allow for different datastores
+* [ ] xstore backend for archival
+* [ ] Configuration for the compression of the archive
+* [ ] Filter/Blacklist option when crawling
+* [ ] Archive crawl errors
+* [ ] Replace ```config.json``` with a queue system
+* [ ] Dockerize
+
