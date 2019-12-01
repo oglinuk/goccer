@@ -34,7 +34,7 @@
 * [ ] Abstract archival to allow for different datastores
 * [ ] gokv backend for archival
 * [ ] Configuration for the compression of the archive
-* [*] Filter/Blacklist option when crawling
+* [X] Filter/Blacklist option when crawling
 * [ ] Archive crawl errors
 * [ ] Replace ```seeds.json``` with a queue system
 * [ ] Dockerize
