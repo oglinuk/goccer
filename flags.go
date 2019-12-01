@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"flag"
@@ -7,17 +7,17 @@ import (
 )
 
 var (
-	SpecificSeed = flag.String("ss", "", "Specific seed to start from")
-	Store        = flag.String("store", "", "Store to persist with")
+	specificSeed = flag.String("s", "", "Specific seed to start from")
 )
 
+// ParseFlags if any
 func ParseFlags() {
 	flag.Parse()
 
-	if *SpecificSeed != "" {
+	if *specificSeed != "" {
 		err := SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
-			Seeds:      []string{*SpecificSeed},
+			Seeds:      []string{*specificSeed},
 		})
 
 		if err != nil {

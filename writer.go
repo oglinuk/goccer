@@ -1,4 +1,4 @@
-package hive
+package main
 
 import (
 	"fmt"
@@ -8,17 +8,20 @@ import (
 	"path/filepath"
 )
 
+// URLFile of a domain subdomains as its content
 type URLFile struct {
 	file *os.File
 	urls map[string]struct{}
 }
 
+// URLWriter is a directory containing URLFiles
 type URLWriter struct {
 	path     string
 	urlFiles map[string]*URLFile
 }
 
-func newURLFile(fPath string) *URLFile {
+// NewURLFile constructor
+func NewURLFile(fPath string) *URLFile {
 	file, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		log.Printf("os.OpenFile (newUrlFile) err: %s", err.Error())
@@ -29,7 +32,8 @@ func newURLFile(fPath string) *URLFile {
 	}
 }
 
-func newURLWriter(dPath string) *URLWriter {
+//NewURLWriter constructor
+func NewURLWriter(dPath string) *URLWriter {
 	err := os.MkdirAll(dPath, 0777)
 	if err != nil {
 		log.Printf("os.MkdirAll (newUrlWriter) err: %s", err.Error())
@@ -40,6 +44,8 @@ func newURLWriter(dPath string) *URLWriter {
 	}
 }
 
+// write checks if the URL base exists as a URLFile; if not create
+// then checks if the URL exists in the URLFile; if not write it
 func (uw *URLWriter) write(URL string) error {
 	u, err := url.Parse(URL)
 	if err != nil {
@@ -53,7 +59,7 @@ func (uw *URLWriter) write(URL string) error {
 	fileDir := filepath.Join(uw.path, base)
 
 	if _, ok := uw.urlFiles[base]; !ok {
-		uw.urlFiles[base] = newURLFile(fileDir)
+		uw.urlFiles[base] = NewURLFile(fileDir)
 	}
 
 	uf := uw.urlFiles[base]

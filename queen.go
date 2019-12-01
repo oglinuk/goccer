@@ -1,4 +1,4 @@
-package hive
+package main
 
 import (
 	"bufio"
@@ -11,6 +11,27 @@ import (
 	"time"
 )
 
+// Queen is the crawling manager
+type Queen struct {
+	seed string
+	pw   *URLWriter
+	rw   *URLWriter
+	ew   *URLWriter
+	aw   *URLFile
+}
+
+// NewQueen constructor
+func NewQueen(s string) *Queen {
+	return &Queen{
+		seed: s,
+		pw:   NewURLWriter("data/crawled"),
+		rw:   NewURLWriter("data/uncrawled"),
+		ew:   NewURLWriter("data/errors"),
+		aw:   NewURLFile(archiveName),
+	}
+}
+
+// SpawnDrone crawls q.seed, then writes each uncrawled URL to the archive file
 func (q *Queen) SpawnDrone() {
 	if err := q.crawl(); err != nil {
 		log.Printf("crawl err: %s", err)
@@ -34,6 +55,8 @@ func (q *Queen) SpawnDrone() {
 	}
 }
 
+// crawl creates an http client, make a Get request, extracts hyperlinks,
+// writes uncrawled URLs to q.rw and q.seed to q.pw
 func (q *Queen) crawl() error {
 	client := http.Client{
 		Transport: &http.Transport{

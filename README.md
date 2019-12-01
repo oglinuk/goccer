@@ -2,10 +2,10 @@
 
 ## How to use
 
-### With Config.json
+### With seeds.json
 
 ```JSON
-// Default config.json
+// Default seeds.json
 {
     "MaxWorkers": 4,
 	"Seeds": [
@@ -22,10 +22,10 @@
 ## Todo
 * [ ] Crawl a device directory
 * [ ] Abstract archival to allow for different datastores
-* [ ] xstore backend for archival
+* [ ] gokv backend for archival
 * [ ] Configuration for the compression of the archive
 * [ ] Filter/Blacklist option when crawling
 * [ ] Archive crawl errors
-* [ ] Replace ```config.json``` with a queue system
+* [ ] Replace ```seeds.json``` with a queue system
 * [ ] Dockerize
 

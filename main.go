@@ -1,31 +1,42 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
-
-	"./conducer"
-	"./utils"
+	"time"
 )
 
-func main() {
-	utils.ParseFlags()
+var (
+	archiveName    = fmt.Sprintf("data/%d", time.Now().Unix())
+	timeComplexity time.Time
+)
 
-	cfg, err := utils.LoadConfig()
+func init() {
+	timeComplexity = time.Now()
+}
+
+func main() {
+	ParseFlags()
+
+	cfg, err := LoadConfig()
 	if err != nil {
-		log.Printf("LoadConfig err: %v", err)
-		return
+		log.Fatalf("LoadConfig err: %v", err)
 	}
 
 	if _, err := os.Stat("data"); err != nil {
 		if err = os.MkdirAll("data", 0777); err != nil {
-			log.Printf("MkdirAll err: %v", err)
+			log.Fatalf("MkdirAll err: %v", err)
 		}
 	}
 
-	archiver := utils.NewArchiver()
+	InitProducer(cfg.MaxWorkers, cfg.Seeds)
 
-	conducer.InitProducer(cfg.MaxWorkers, cfg.Seeds, archiver.ArchiveFile)
+	collected, err := Archive()
+	if err != nil {
+		log.Fatalf("Failed to Archive: %s", err.Error())
+	}
 
-	archiver.Archive()
+	log.Printf("Crawled [%d] and collected [%d] in %s ...",
+		len(cfg.Seeds), collected, time.Since(timeComplexity))
 }

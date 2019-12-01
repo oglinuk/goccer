@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"encoding/json"
@@ -7,14 +7,16 @@ import (
 )
 
 const (
-	configName string = "config.json"
+	configName string = "seeds.json"
 )
 
+// Config file
 type Config struct {
 	MaxWorkers int
 	Seeds      []string
 }
 
+// SaveConfig file
 func SaveConfig(cf *Config) error {
 	f, err := os.Create(configName)
 	if err != nil {
@@ -29,6 +31,7 @@ func SaveConfig(cf *Config) error {
 	return nil
 }
 
+// LoadConfig file
 func LoadConfig() (Config, error) {
 	var cf Config
 	f, err := os.Open(configName)
