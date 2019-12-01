@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 )
@@ -20,18 +19,17 @@ func Archive() (int, error) {
 	}
 	defer file.Close()
 
-	af, err := createArchive()
+	za, err := zipArchive()
 	if err != nil {
 		return 0, err
 	}
-	defer af.Close()
+	defer za.Close()
 
-	aw, err := af.Create(fmt.Sprintf("%s.txt", archiveName))
+	aw, err := za.Create(fmt.Sprintf("%s.txt", archiveName))
 	if err != nil {
 		return 0, err
 	}
 
-	log.Println("Processing archival ...")
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		scanned := scanner.Text()
@@ -44,7 +42,16 @@ func Archive() (int, error) {
 
 	err = SaveConfig(&Config{
 		MaxWorkers: runtime.GOMAXPROCS(0),
-		Seeds:      uncrawled,
+		Filters: []string{
+			"facebook",
+			"instagram",
+			"youtube",
+			"google",
+			"amazon",
+			"microsoft",
+			"azure",
+		},
+		Seeds: uncrawled,
 	})
 
 	if err != nil {
@@ -56,12 +63,11 @@ func Archive() (int, error) {
 		return 0, err
 	}
 
-	log.Println("Finished archival ...")
-
 	return len(uncrawled), nil
 }
 
-func createArchive() (*zip.Writer, error) {
+// zipArchive creates/returns a zip writer
+func zipArchive() (*zip.Writer, error) {
 	af, err := os.Create(fmt.Sprintf("%s.zip", archiveName))
 	if err != nil {
 		return nil, err

@@ -21,12 +21,12 @@ type Queen struct {
 }
 
 // NewQueen constructor
-func NewQueen(s string) *Queen {
+func NewQueen(s string, filters []string) *Queen {
 	return &Queen{
 		seed: s,
-		pw:   NewURLWriter("data/crawled"),
-		rw:   NewURLWriter("data/uncrawled"),
-		ew:   NewURLWriter("data/errors"),
+		pw:   NewURLWriter("data/crawled", filters),
+		rw:   NewURLWriter("data/uncrawled", filters),
+		ew:   NewURLWriter("data/errors", filters),
 		aw:   NewURLFile(archiveName),
 	}
 }
@@ -64,7 +64,7 @@ func (q *Queen) crawl() error {
 				InsecureSkipVerify: true,
 			},
 		},
-		Timeout: time.Second * 30,
+		Timeout: time.Second * 7,
 	}
 
 	resp, err := client.Get(q.seed)

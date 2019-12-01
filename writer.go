@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // URLFile of a domain subdomains as its content
@@ -17,6 +18,7 @@ type URLFile struct {
 // URLWriter is a directory containing URLFiles
 type URLWriter struct {
 	path     string
+	filters  []string
 	urlFiles map[string]*URLFile
 }
 
@@ -33,13 +35,14 @@ func NewURLFile(fPath string) *URLFile {
 }
 
 //NewURLWriter constructor
-func NewURLWriter(dPath string) *URLWriter {
+func NewURLWriter(dPath string, filts []string) *URLWriter {
 	err := os.MkdirAll(dPath, 0777)
 	if err != nil {
 		log.Printf("os.MkdirAll (newUrlWriter) err: %s", err.Error())
 	}
 	return &URLWriter{
 		path:     dPath,
+		filters:  filts,
 		urlFiles: make(map[string]*URLFile),
 	}
 }
@@ -47,6 +50,10 @@ func NewURLWriter(dPath string) *URLWriter {
 // write checks if the URL base exists as a URLFile; if not create
 // then checks if the URL exists in the URLFile; if not write it
 func (uw *URLWriter) write(URL string) error {
+	if uw.filter(URL) {
+		return nil
+	}
+
 	u, err := url.Parse(URL)
 	if err != nil {
 		return err
@@ -77,4 +84,14 @@ func (uw *URLWriter) write(URL string) error {
 	uf.file.Close()
 
 	return nil
+}
+
+// filter check if contains one of the filters
+func (uw *URLWriter) filter(check string) bool {
+	for _, f := range uw.filters {
+		if strings.Contains(strings.ToLower(check), f) {
+			return true
+		}
+	}
+	return false
 }

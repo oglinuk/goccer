@@ -11,12 +11,12 @@ type Job struct {
 }
 
 // InitProducer queues all of the seeds to the worker pool
-func InitProducer(workers int, seeds []string) {
+func InitProducer(workers int, seeds, filters []string) {
 	jobs := make(chan Job)
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= workers; i++ {
-		go consume(jobs, wg)
+		go consume(jobs, wg, filters)
 	}
 
 	for i, seed := range seeds {
@@ -31,14 +31,14 @@ func InitProducer(workers int, seeds []string) {
 }
 
 // consume all the queued jobs
-func consume(jobs <-chan Job, wg *sync.WaitGroup) {
+func consume(jobs <-chan Job, wg *sync.WaitGroup, filters []string) {
 	for {
 		select {
 		case job, ok := <-jobs:
 			if !ok {
 				return
 			}
-			q := NewQueen(job.URL)
+			q := NewQueen(job.URL, filters)
 			q.SpawnDrone()
 			wg.Done()
 		}

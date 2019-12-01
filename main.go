@@ -14,23 +14,23 @@ var (
 
 func init() {
 	timeComplexity = time.Now()
-}
 
-func main() {
 	ParseFlags()
-
-	cfg, err := LoadConfig()
-	if err != nil {
-		log.Fatalf("LoadConfig err: %v", err)
-	}
 
 	if _, err := os.Stat("data"); err != nil {
 		if err = os.MkdirAll("data", 0777); err != nil {
 			log.Fatalf("MkdirAll err: %v", err)
 		}
 	}
+}
 
-	InitProducer(cfg.MaxWorkers, cfg.Seeds)
+func main() {
+	cfg, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("LoadConfig err: %v", err)
+	}
+
+	InitProducer(cfg.MaxWorkers, cfg.Seeds, cfg.Filters)
 
 	collected, err := Archive()
 	if err != nil {

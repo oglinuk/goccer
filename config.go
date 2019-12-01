@@ -13,6 +13,7 @@ const (
 // Config file
 type Config struct {
 	MaxWorkers int
+	Filters    []string
 	Seeds      []string
 }
 
@@ -38,6 +39,15 @@ func LoadConfig() (Config, error) {
 	if err != nil {
 		SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
+			Filters: []string{
+				"facebook",
+				"instagram",
+				"youtube",
+				"google",
+				"amazon",
+				"microsoft",
+				"azure",
+			},
 			Seeds: []string{
 				"https://en.wikipedia.org/wiki/Chaos_Theory",
 				"https://en.wikipedia.org/wiki/Machine_Learning",
