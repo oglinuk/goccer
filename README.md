@@ -8,7 +8,7 @@
 // Default seeds.json
 {
 	"MaxWorkers": 4,
-	"Filter": [
+	"Filters": [
 		"facebook",
 		"instagram",
 		"youtube",
@@ -29,12 +29,12 @@
 ```./goccer -s https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
+* [X] Filter option when crawling
+* [ ] Change from net/http to [fasthttp](https://github.com/valyala/fasthttp)
+* [ ] Change from JSON configuration to YAML
+* [ ] Replace seeds in configuration file to a queue system
 * [ ] Crawl other targets
-	* [ ] Device filesystems
-* [ ] Abstract archival to allow for different datastores
-* [ ] gokv backend for archival
-* [ ] Configuration for the compression of the archive
-* [X] Filter/Blacklist option when crawling
-* [ ] Archive crawl errors
-* [ ] Replace ```seeds.json``` with a queue system
+	* [ ] Linux filesystems
+	* [ ] Windows filesystems
+* [ ] Abstract archival to allow for different stores
 * [ ] Dockerize
