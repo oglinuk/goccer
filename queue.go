@@ -7,39 +7,44 @@ import (
 
 // Job to be crawled
 type Job struct {
-	URL string
+	Crawler string
+	Path    string
 }
 
-// InitProducer queues all of the seeds to the worker pool
-func InitProducer(workers int, seeds, filters []string) {
+// InitProducer queues all of the paths to the worker pool
+func InitProducer(workers int, crawler string, paths, filters []string) {
 	jobs := make(chan Job)
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= workers; i++ {
-		go consume(jobs, wg, filters)
+		go consume(jobs, wg)
 	}
 
-	for i, seed := range seeds {
+	for i, path := range paths {
 		wg.Add(1)
-		go func(i int, seed string) {
-			log.Printf("Fetching[%d]: %s", i, seed)
-			jobs <- Job{URL: seed}
-		}(i, seed)
+		go func(i int, path string) {
+			log.Printf("Crawling[%d]: %s", i, path)
+			jobs <- Job{Crawler: crawler, Path: path}
+		}(i, path)
 	}
 	wg.Wait()
 	close(jobs)
 }
 
 // consume all the queued jobs
-func consume(jobs <-chan Job, wg *sync.WaitGroup, filters []string) {
+func consume(jobs <-chan Job, wg *sync.WaitGroup) {
 	for {
 		select {
 		case job, ok := <-jobs:
 			if !ok {
 				return
 			}
-			q := NewQueen(job.URL, filters)
-			q.SpawnDrone()
+			log.Println(job)
+			c, err := CreateCrawler(job.Crawler, job.Path)
+			if err != nil {
+				log.Printf("queue.go::consume::CreateCrawler::ERROR: %s", err.Error())
+			}
+			c.Crawl()
 			wg.Done()
 		}
 	}

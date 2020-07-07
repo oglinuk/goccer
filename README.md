@@ -2,39 +2,41 @@
 
 ## How to use
 
-### With seeds.json
+### With config.json
 
 ```JSON
-// Default seeds.json
+// Default config.json
 {
 	"MaxWorkers": 4,
+	"Crawler": "http",
 	"Filters": [
 		"facebook",
 		"instagram",
-		"youtube",
 		"google",
+		"youtube",
 		"amazon",
 		"microsoft",
-		"azure"
+		"apple",
 	],
-	"Seeds": [
+	"Paths": [
 		"https://en.wikipedia.org/wiki/Chaos_Theory",
 		"https://en.wikipedia.org/wiki/Machine_Learning"
 	]
 }
 ```
 
-### With Specific Seed Flag
+### With Seed Flag
 
-```./goccer -s https://en.wikipedia.org/wiki/Deep_Learning```
+```./main -ct http -p https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
-* [X] Filter option when crawling
-* [ ] Change from net/http to [fasthttp](https://github.com/valyala/fasthttp)
-* [ ] Change from JSON configuration to YAML
-* [ ] Replace seeds in configuration file to a queue system
-* [ ] Crawl other targets
-	* [ ] Linux filesystems
-	* [ ] Windows filesystems
-* [ ] Abstract archival to allow for different stores
-* [ ] Dockerize
+* [X] Abstract crawler to allow for different types of crawlers 
+	* [X] Implement HTTP crawler
+	* [ ] Implement Filesystem crawler
+* [ ] Abstract writer to allow for different store options
+	* [X] Implement writing to disk
+	* [ ] Implement writing to database
+* [ ] Implement compression?
+* [X] Implement filters
+* [ ] Store crawl errors
+* [ ] Dockerize crawlers
