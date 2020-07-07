@@ -30,13 +30,8 @@ func main() {
 		log.Fatalf("LoadConfig err: %v", err)
 	}
 
-	InitProducer(cfg.MaxWorkers, cfg.Seeds, cfg.Filters)
+	InitProducer(cfg.MaxWorkers, cfg.Crawler, cfg.Paths, cfg.Filters)
 
-	collected, err := Archive()
-	if err != nil {
-		log.Fatalf("Failed to Archive: %s", err.Error())
-	}
-
-	log.Printf("Crawled [%d] and collected [%d] in %s ...",
-		len(cfg.Seeds), collected, time.Since(timeComplexity))
+	log.Printf("Crawled [%d] in %s ...",
+		len(cfg.Paths), time.Since(timeComplexity))
 }

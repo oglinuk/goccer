@@ -7,17 +7,19 @@ import (
 )
 
 var (
-	specificSeed = flag.String("s", "", "Specific seed to start from")
+	crawlerType = flag.String("ct", "", "Crawler type")
+	path        = flag.String("p", "", "Specific path to start from")
 )
 
 // ParseFlags if any
 func ParseFlags() {
 	flag.Parse()
 
-	if *specificSeed != "" {
+	if *path != "" && *crawlerType != "" {
 		err := SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
-			Seeds:      []string{*specificSeed},
+			Crawler:    *crawlerType,
+			Paths:      []string{*path},
 		})
 
 		if err != nil {

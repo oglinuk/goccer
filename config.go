@@ -7,14 +7,15 @@ import (
 )
 
 const (
-	configName string = "seeds.json"
+	configName string = "config.json"
 )
 
 // Config file
 type Config struct {
 	MaxWorkers int
+	Crawler    string
 	Filters    []string
-	Seeds      []string
+	Paths      []string
 }
 
 // SaveConfig file
@@ -39,16 +40,17 @@ func LoadConfig() (Config, error) {
 	if err != nil {
 		SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
+			Crawler:    "http",
 			Filters: []string{
 				"facebook",
 				"instagram",
-				"youtube",
 				"google",
+				"youtube",
 				"amazon",
 				"microsoft",
-				"azure",
+				"apple",
 			},
-			Seeds: []string{
+			Paths: []string{
 				"https://en.wikipedia.org/wiki/Chaos_Theory",
 				"https://en.wikipedia.org/wiki/Machine_Learning",
 			},

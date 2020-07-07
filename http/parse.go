@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"io"
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func (q *Queen) extract(resp *http.Response) []string {
+func (c Crawler) extract(resp *http.Response) []string {
 	if resp == nil {
 		return nil
 	}
@@ -18,7 +18,7 @@ func (q *Queen) extract(resp *http.Response) []string {
 	rebuiltLinks := []string{}
 
 	for _, link := range links {
-		url := rebuildURL(link, q.seed)
+		url := rebuildURL(link, c.seed)
 		if url != "" {
 			rebuiltLinks = append(rebuiltLinks, url)
 		}

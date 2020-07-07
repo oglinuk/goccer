@@ -2,30 +2,41 @@
 
 ## How to use
 
-### With seeds.json
+### With config.json
 
 ```JSON
-// Default seeds.json
+// Default config.json
 {
-    "MaxWorkers": 4,
-	"Seeds": [
+	"MaxWorkers": 4,
+	"Crawler": "http",
+	"Filters": [
+		"facebook",
+		"instagram",
+		"google",
+		"youtube",
+		"amazon",
+		"microsoft",
+		"apple",
+	],
+	"Paths": [
 		"https://en.wikipedia.org/wiki/Chaos_Theory",
 		"https://en.wikipedia.org/wiki/Machine_Learning"
 	]
 }
 ```
 
-### With Specific Seed Flag
+### With Seed Flag
 
-```./main -s https://en.wikipedia.org/wiki/Deep_Learning```
+```./main -ct http -p https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
-* [ ] Crawl a device directory
-* [ ] Abstract archival to allow for different datastores
-* [ ] gokv backend for archival
-* [ ] Configuration for the compression of the archive
-* [ ] Filter/Blacklist option when crawling
-* [ ] Archive crawl errors
-* [ ] Replace ```seeds.json``` with a queue system
-* [ ] Dockerize
-
+* [X] Abstract crawler to allow for different types of crawlers 
+	* [X] Implement HTTP crawler
+	* [ ] Implement Filesystem crawler
+* [ ] Abstract writer to allow for different store options
+	* [X] Implement writing to disk
+	* [ ] Implement writing to database
+* [ ] Implement compression?
+* [X] Implement filters
+* [ ] Store crawl errors
+* [ ] Dockerize crawlers
