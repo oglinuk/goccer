@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"./fs"
-	"./http"
+	"github.com/oglinuk/goccer/fs"
+	"github.com/oglinuk/goccer/http"
 )
 
 // Crawler is the base for a thing that crawls the given path

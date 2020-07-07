@@ -25,7 +25,7 @@
 }
 ```
 
-### With Seed Flag
+### With Flags
 
 ```./main -ct http -p https://en.wikipedia.org/wiki/Deep_Learning```
 
