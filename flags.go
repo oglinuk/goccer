@@ -8,6 +8,7 @@ import (
 
 var (
 	crawlerType = flag.String("ct", "", "Crawler type")
+	writerType  = flag.String("wt", "", "Writer type")
 	path        = flag.String("p", "", "Specific path to start from")
 )
 
@@ -15,11 +16,22 @@ var (
 func ParseFlags() {
 	flag.Parse()
 
-	if *path != "" && *crawlerType != "" {
+	if *path != "" && *crawlerType != "" && *writerType != "" {
 		err := SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
 			Crawler:    *crawlerType,
-			Paths:      []string{*path},
+			Writer:     *writerType,
+			// TODO: Im lazy, but need to add flag for filters eventually ...
+			Filters: []string{
+				"facebook",
+				"instagram",
+				"google",
+				"youtube",
+				"amazon",
+				"microsoft",
+				"apple",
+			},
+			Paths: []string{*path},
 		})
 
 		if err != nil {

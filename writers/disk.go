@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // DiskStore is self explanitory
@@ -35,54 +34,57 @@ func NewDiskStore(fPath string) *DiskStore {
 }
 
 // NewDiskWriter constructor
-func NewDiskWriter(dPath string, filts []string) *DiskWriter {
-	err := os.MkdirAll(dPath, 0777)
+func NewDiskWriter(dir string, filts []string) *DiskWriter {
+	err := os.MkdirAll(dir, 0777)
 	if err != nil {
 		log.Printf("os.MkdirAll (NewDiskWriter) err: %s", err.Error())
 	}
+
 	return &DiskWriter{
-		path:       dPath,
+		path:       dir,
 		filters:    filts,
 		diskStores: make(map[string]*DiskStore),
 	}
 }
 
-func (dw *DiskWriter) write(path string) error {
+func (dw *DiskWriter) Write(paths []string) error {
 	// If path contains one of the filters return early
-	for _, f := range dw.filters {
-		if strings.Contains(strings.ToLower(path), f) {
-			return nil
+	for _, p := range paths {
+		// for _, f := range dw.filters {
+		// 	if strings.Contains(strings.ToLower(p), f) {
+		// 		return nil
+		// 	}
+		// }
+
+		u, err := url.Parse(p)
+		if err != nil {
+			return err
 		}
+
+		base := u.Hostname()
+		if base == "" || base == " " {
+			base = "error"
+		}
+		fileDir := filepath.Join(dw.path, base)
+
+		if _, ok := dw.diskStores[base]; !ok {
+			dw.diskStores[base] = NewDiskStore(fileDir)
+		}
+
+		ds := dw.diskStores[base]
+
+		decoded, err := url.QueryUnescape(p)
+		if err != nil {
+			return err
+		}
+
+		if _, exists := ds.paths[decoded]; !exists {
+			ds.file.WriteString(fmt.Sprintf("%s\n", decoded))
+			ds.paths[decoded] = struct{}{}
+		}
+
+		ds.file.Close()
 	}
-
-	u, err := url.Parse(path)
-	if err != nil {
-		return err
-	}
-
-	base := u.Hostname()
-	if base == "" || base == " " {
-		base = "error"
-	}
-	fileDir := filepath.Join(dw.path, base)
-
-	if _, ok := dw.diskStores[base]; !ok {
-		dw.diskStores[base] = NewDiskStore(fileDir)
-	}
-
-	ds := dw.diskStores[base]
-
-	decoded, err := url.QueryUnescape(path)
-	if err != nil {
-		return err
-	}
-
-	if _, exists := ds.paths[decoded]; !exists {
-		ds.file.WriteString(fmt.Sprintf("%s\n", decoded))
-		ds.paths[decoded] = struct{}{}
-	}
-
-	ds.file.Close()
 
 	return nil
 }

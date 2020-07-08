@@ -13,6 +13,6 @@ func NewFSCrawler(p string) FSCrawler {
 }
 
 // Crawl c.path
-func (c FSCrawler) Crawl() error {
+func (c FSCrawler) Crawl() []string {
 	return nil
 }

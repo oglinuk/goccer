@@ -9,6 +9,7 @@
 {
 	"MaxWorkers": 4,
 	"Crawler": "http",
+	"Writer": "disk",
 	"Filters": [
 		"facebook",
 		"instagram",
@@ -16,7 +17,7 @@
 		"youtube",
 		"amazon",
 		"microsoft",
-		"apple",
+		"apple"
 	],
 	"Paths": [
 		"https://en.wikipedia.org/wiki/Chaos_Theory",
@@ -27,16 +28,18 @@
 
 ### With Flags
 
-```./main -ct http -p https://en.wikipedia.org/wiki/Deep_Learning```
+```./goccer -ct http -wt disk -p https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
 * [X] Abstract crawler to allow for different types of crawlers 
 	* [X] Implement HTTP crawler
 	* [ ] Implement Filesystem crawler
-* [ ] Abstract writer to allow for different store options
-	* [X] Implement writing to disk
-	* [ ] Implement writing to database
+* [X] Abstract writer to allow for different store options
+	* [X] Implement disk store
+	* [ ] Implement memory store
+	* [ ] Implement database store
 * [ ] Implement compression?
 * [X] Implement filters
 * [ ] Store crawl errors
-* [ ] Dockerize crawlers
+* [ ] Dockerize
+* [ ] Create examples?

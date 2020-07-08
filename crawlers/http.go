@@ -10,27 +10,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oglinuk/goccer"
-
 	"golang.org/x/net/html"
 )
 
 // HTTPCrawler for HTTP URLs
 type HTTPCrawler struct {
-	seed   string
-	writer goccer.Writer
+	seed string
 }
 
 // NewHTTPCrawler constructor
-func NewHTTPCrawler(s string, w goccer.Writer) HTTPCrawler {
+func NewHTTPCrawler(s string) HTTPCrawler {
 	return HTTPCrawler{
-		seed:   s,
-		writer: w,
+		seed: s,
 	}
 }
 
 // Crawl c.seed and extract all URLs
-func (c HTTPCrawler) Crawl() {
+func (c HTTPCrawler) Crawl() []string {
+	var collected []string
+
 	client := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -43,20 +41,24 @@ func (c HTTPCrawler) Crawl() {
 	resp, err := client.Get(c.seed)
 	if err != nil {
 		log.Printf("crawlers::http.go::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+		return nil
 	}
 
 	if resp == nil {
 		log.Println("crawlers::http.go::resp::NIL")
+		return nil
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		for _, URL := range c.extract(resp) {
-			// TODO: Replace below with refactored http writer implementation
-			log.Println(URL)
+			collected = append(collected, URL)
 		}
 	} else {
 		log.Printf("crawlers::http.go::resp.StatusCode: %d", resp.StatusCode)
+		return nil
 	}
+
+	return collected
 }
 
 func (c HTTPCrawler) extract(resp *http.Response) []string {

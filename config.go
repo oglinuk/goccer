@@ -14,6 +14,7 @@ const (
 type Config struct {
 	MaxWorkers int
 	Crawler    string
+	Writer     string
 	Filters    []string
 	Paths      []string
 }
@@ -41,6 +42,7 @@ func LoadConfig() (Config, error) {
 		SaveConfig(&Config{
 			MaxWorkers: runtime.GOMAXPROCS(0),
 			Crawler:    "http",
+			Writer:     "disk",
 			Filters: []string{
 				"facebook",
 				"instagram",
