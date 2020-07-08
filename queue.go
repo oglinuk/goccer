@@ -7,12 +7,13 @@ import (
 
 // Job to be crawled
 type Job struct {
-	Crawler string
-	Path    string
+	crawler string
+	writer  string
+	path    string
 }
 
 // InitProducer queues all of the paths to the worker pool
-func InitProducer(workers int, crawler string, paths, filters []string) {
+func InitProducer(workers int, c, w string, paths, filters []string) {
 	jobs := make(chan Job)
 
 	wg := &sync.WaitGroup{}
@@ -22,10 +23,10 @@ func InitProducer(workers int, crawler string, paths, filters []string) {
 
 	for i, path := range paths {
 		wg.Add(1)
-		go func(i int, path string) {
+		go func(i int, c, w, path string) {
 			log.Printf("Crawling[%d]: %s", i, path)
-			jobs <- Job{Crawler: crawler, Path: path}
-		}(i, path)
+			jobs <- Job{crawler: c, writer: w, Path: path}
+		}(i, c, w, path)
 	}
 	wg.Wait()
 	close(jobs)
@@ -40,7 +41,7 @@ func consume(jobs <-chan Job, wg *sync.WaitGroup) {
 				return
 			}
 			log.Println(job)
-			c, err := CreateCrawler(job.Crawler, job.Path)
+			c, err := CreateCrawler(job.crawler, job.Path, CreateWriter(job.writer))
 			if err != nil {
 				log.Printf("queue.go::consume::CreateCrawler::ERROR: %s", err.Error())
 			}

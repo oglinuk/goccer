@@ -3,22 +3,21 @@ package main
 import (
 	"fmt"
 
-	"github.com/oglinuk/goccer/fs"
-	"github.com/oglinuk/goccer/http"
+	"github.com/oglinuk/goccer/crawlers"
 )
 
 // Crawler is the base for a thing that crawls the given path
 type Crawler interface {
-	Crawl() error
+	Crawl()
 }
 
 // CreateCrawler of ctype with given path
-func CreateCrawler(ctype, path string) (Crawler, error) {
+func CreateCrawler(ctype, path string, w Writer) (Crawler, error) {
 	switch ctype {
 	case "http":
-		return http.NewCrawler(path), nil
+		return crawlers.NewHTTPCrawler(path, w), nil
 	case "fs":
-		return fs.NewCrawler(path), nil
+		return crawlers.NewFSCrawler(path), nil
 	default:
 		return nil, fmt.Errorf("crawler.go::CreateCrawler(%s, ...)::ERROR: Invalid crawler type", ctype)
 	}
