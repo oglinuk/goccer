@@ -4,8 +4,8 @@ import (
 	"log"
 	"sync"
 
-	"./crawlers"
-	"./writers"
+	"github.com/oglinuk/goccer/crawlers"
+	"github.com/oglinuk/goccer/writers"
 )
 
 // Job to be crawled
