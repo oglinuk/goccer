@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
 )
 
 var (
-	archiveName    = fmt.Sprintf("data/%d", time.Now().Unix())
 	timeComplexity time.Time
 )
 
@@ -17,8 +15,8 @@ func init() {
 
 	ParseFlags()
 
-	if _, err := os.Stat(archiveName); err != nil {
-		if err = os.MkdirAll(archiveName, 0777); err != nil {
+	if _, err := os.Stat("data"); err != nil {
+		if err = os.MkdirAll("data", 0777); err != nil {
 			log.Fatalf("MkdirAll err: %v", err)
 		}
 	}
@@ -30,8 +28,7 @@ func main() {
 		log.Fatalf("LoadConfig err: %v", err)
 	}
 
-	InitProducer(cfg.MaxWorkers, cfg.Crawler, cfg.Writer, archiveName, cfg.Paths, cfg.Filters)
+	InitProducer(cfg.MaxWorkers, cfg.Crawler, cfg.Writer, cfg.Paths, cfg.Filters)
 
-	log.Printf("Crawled [%d] in %s ...",
-		len(cfg.Paths), time.Since(timeComplexity))
+	log.Printf("Crawled [%d] in %s ...", len(cfg.Paths), time.Since(timeComplexity))
 }

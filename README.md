@@ -34,10 +34,10 @@
 * [X] Abstract crawler to allow for different types of crawlers 
 	* [X] Implement HTTP crawler
 	* [ ] Implement Filesystem crawler
-* [X] Abstract writer to allow for different store options
-	* [X] Implement disk store
-	* [ ] Implement memory store
-	* [ ] Implement database store
+* [X] Abstract writer to allow for different types of writers
+	* [X] Implement disk writer
+	* [ ] Implement memory writer
+	* [ ] Implement database writer
 * [ ] Implement compression?
 * [X] Implement filters
 * [ ] Store crawl errors

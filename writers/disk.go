@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // DiskStore is self explanitory
@@ -47,14 +48,14 @@ func NewDiskWriter(dir string, filts []string) *DiskWriter {
 	}
 }
 
+// Write paths to disk
 func (dw *DiskWriter) Write(paths []string) error {
-	// If path contains one of the filters return early
 	for _, p := range paths {
-		// for _, f := range dw.filters {
-		// 	if strings.Contains(strings.ToLower(p), f) {
-		// 		return nil
-		// 	}
-		// }
+		for _, f := range dw.filters {
+			if strings.Contains(strings.ToLower(p), f) {
+				return nil
+			}
+		}
 
 		u, err := url.Parse(p)
 		if err != nil {
@@ -65,10 +66,10 @@ func (dw *DiskWriter) Write(paths []string) error {
 		if base == "" || base == " " {
 			base = "error"
 		}
-		fileDir := filepath.Join(dw.path, base)
+		fpath := filepath.Join(dw.path, base)
 
 		if _, ok := dw.diskStores[base]; !ok {
-			dw.diskStores[base] = NewDiskStore(fileDir)
+			dw.diskStores[base] = NewDiskStore(fpath)
 		}
 
 		ds := dw.diskStores[base]

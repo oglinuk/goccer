@@ -15,13 +15,13 @@ type Job struct {
 	path    string
 }
 
-// InitProducer queues all of the paths to the worker pool
-func InitProducer(workers int, c, w, d string, paths, filters []string) {
+// InitProducer queues all paths to the worker pool
+func InitProducer(workers int, c, w string, paths, filters []string) {
 	jobs := make(chan Job)
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i <= workers; i++ {
-		go consume(jobs, wg, filters, d)
+		go consume(jobs, wg, filters)
 	}
 
 	for i, path := range paths {
@@ -36,17 +36,25 @@ func InitProducer(workers int, c, w, d string, paths, filters []string) {
 }
 
 // consume all the queued jobs
-func consume(jobs <-chan Job, wg *sync.WaitGroup, filters []string, dir string) {
+func consume(jobs <-chan Job, wg *sync.WaitGroup, filters []string) {
 	for {
 		select {
 		case job, ok := <-jobs:
 			if !ok {
 				return
 			}
+
+			pw := writers.CreateWriter(job.writer, "data/parsed", filters)
+			if pw != nil {
+				pw.Write([]string{job.path})
+			}
+
 			c := crawlers.CreateCrawler(job.crawler, job.path)
-			w := writers.CreateWriter(job.writer, dir, filters)
-			if c != nil && w != nil {
-				w.Write(c.Crawl())
+			rw := writers.CreateWriter(job.writer, "data/raw", filters)
+			if c != nil && rw != nil {
+				collection := c.Crawl()
+				rw.Write(collection)
+				log.Printf("Collected %d paths from %s ...", len(collection), job.path)
 			}
 			wg.Done()
 		}

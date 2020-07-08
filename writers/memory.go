@@ -28,7 +28,8 @@ func NewMemoryWriter(basePath string, filters []string) *MemoryWriter {
 	}
 }
 
-func (mw *MemoryWriter) Write(path []string) error {
+// Write paths to memory
+func (mw *MemoryWriter) Write(paths []string) error {
 
 	return nil
 }
