@@ -2,10 +2,12 @@ package crawlers
 
 import (
 	"crypto/tls"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -40,21 +42,39 @@ func (c HTTPCrawler) Crawl() []string {
 
 	resp, err := client.Get(c.seed)
 	if err != nil {
-		log.Printf("crawlers::http.go::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+		log.Printf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s",
+			c.seed, err.Error())
 		return nil
 	}
+	defer resp.Body.Close()
 
 	if resp == nil {
-		log.Println("crawlers::http.go::resp::NIL")
+		log.Println("crawlers::http.go::Crawl::resp::NIL")
 		return nil
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		if strings.Contains(resp.Header.Get("Content-Type"), "application/pdf") {
+			splitPath := strings.Split(c.seed, "/")
+			pdfName := fmt.Sprintf("data/%s", splitPath[len(splitPath)-1])
+			pdf, err := os.Create(pdfName)
+			if err != nil {
+				log.Printf("crawlers::http.go::Crawl::os.Create(%s)::ERROR: %s",
+					pdfName, err.Error())
+				return nil
+			}
+			defer pdf.Close()
+
+			io.Copy(pdf, resp.Body)
+
+			return nil
+		}
+
 		for _, URL := range c.extract(resp) {
 			collected = append(collected, URL)
 		}
 	} else {
-		log.Printf("crawlers::http.go::resp.StatusCode: %d", resp.StatusCode)
+		log.Printf("crawlers::http.go::Crawl::resp.StatusCode: %d", resp.StatusCode)
 		return nil
 	}
 
@@ -74,8 +94,6 @@ func (c HTTPCrawler) extract(resp *http.Response) []string {
 			rebuiltLinks = append(rebuiltLinks, url)
 		}
 	}
-
-	resp.Body.Close()
 
 	return rebuiltLinks
 }

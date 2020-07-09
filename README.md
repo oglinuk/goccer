@@ -40,6 +40,7 @@
 	* [ ] Implement database writer
 * [ ] Implement compression?
 * [X] Implement filters
+* [X] Implement pdf downloading
 * [ ] Store crawl errors
 * [ ] Dockerize
 * [ ] Create examples?

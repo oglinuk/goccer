@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+var (
+	baseDiskDirName = "data"
+)
+
 // DiskStore is self explanitory
 type DiskStore struct {
 	file  *os.File
@@ -23,10 +27,13 @@ type DiskWriter struct {
 }
 
 // NewDiskStore constructor
-func NewDiskStore(fPath string) *DiskStore {
-	file, err := os.OpenFile(fPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+// TODO: Figure out why there is an inconsistent number of files when crawling
+// the two default config.json seeds
+func NewDiskStore(fpath string) *DiskStore {
+	file, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Printf("os.OpenFile (NewDiskStore) err: %s", err.Error())
+		log.Printf("crawlers::disk.go::NewDiskWriter::os.OpenFile(%s)::ERROR: %s",
+			fpath, err.Error())
 	}
 	return &DiskStore{
 		file:  file,
@@ -36,9 +43,17 @@ func NewDiskStore(fPath string) *DiskStore {
 
 // NewDiskWriter constructor
 func NewDiskWriter(dir string, filts []string) *DiskWriter {
+	if _, err := os.Stat(baseDiskDirName); err != nil {
+		if err = os.MkdirAll(baseDiskDirName, 0777); err != nil {
+			log.Fatalf("crawlers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s",
+				baseDiskDirName, err.Error())
+		}
+	}
+
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
-		log.Printf("os.MkdirAll (NewDiskWriter) err: %s", err.Error())
+		log.Printf("crawlers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s",
+			dir, err.Error())
 	}
 
 	return &DiskWriter{

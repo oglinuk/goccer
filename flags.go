@@ -35,7 +35,7 @@ func ParseFlags() {
 		})
 
 		if err != nil {
-			log.Printf("SaveConfig err: %v", err)
+			log.Printf("flags.go::ParseFlags::SaveConfig::ERROR: %s", err.Error())
 		}
 	}
 }
