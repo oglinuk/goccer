@@ -49,6 +49,9 @@ func InitProducer(cfg Config) {
 
 // consume all queued jobs in the WorkerPool
 func consume(wp WorkerPool) {
+	pw := writers.CreateWriter(wp.writer, "data/parsed", wp.filters)
+	rw := writers.CreateWriter(wp.writer, "data/raw", wp.filters)
+
 	for {
 		select {
 		case job, ok := <-wp.jobs:
@@ -56,13 +59,11 @@ func consume(wp WorkerPool) {
 				return
 			}
 
-			pw := writers.CreateWriter(wp.writer, "data/parsed", wp.filters)
 			if pw != nil {
 				pw.Write([]string{job.path})
 			}
 
 			c := crawlers.CreateCrawler(wp.crawler, job.path)
-			rw := writers.CreateWriter(wp.writer, "data/raw", wp.filters)
 			if c != nil && rw != nil {
 				collection := c.Crawl()
 				if collection != nil {

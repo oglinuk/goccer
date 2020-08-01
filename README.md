@@ -33,6 +33,7 @@
 ## Todo
 * [X] Abstract crawler to allow for different types of crawlers 
 	* [X] Implement HTTP crawler
+		* [X] Implement pdf downloading
 	* [ ] Implement Filesystem crawler
 * [X] Abstract writer to allow for different types of writers
 	* [X] Implement disk writer
@@ -40,7 +41,6 @@
 	* [ ] Implement database writer
 * [ ] Implement compression?
 * [X] Implement filters
-* [X] Implement pdf downloading
 * [ ] Store crawl errors
 * [ ] Dockerize
 * [ ] Create examples?
