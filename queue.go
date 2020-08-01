@@ -2,10 +2,11 @@ package main
 
 import (
 	"log"
+	"strings"
 	"sync"
 
-	"./crawlers"
-	"./writers"
+	"github.com/oglinuk/goccer/crawlers"
+	"github.com/oglinuk/goccer/writers"
 )
 
 // Job to be crawled
@@ -47,16 +48,35 @@ func InitProducer(cfg Config) {
 	close(wp.jobs)
 }
 
+// check if path contains any of the wp.filters
+// TODO: Refactor below to do string.Contains concurrently
+func (wp WorkerPool) check(path string) bool {
+	for _, filter := range wp.filters {
+		if strings.Contains(path, filter) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // consume all queued jobs in the WorkerPool
 func consume(wp WorkerPool) {
-	pw := writers.CreateWriter(wp.writer, "data/parsed", wp.filters)
-	rw := writers.CreateWriter(wp.writer, "data/raw", wp.filters)
+	pw := writers.CreateWriter(wp.writer, "data/parsed")
+	rw := writers.CreateWriter(wp.writer, "data/raw")
 
 	for {
 		select {
 		case job, ok := <-wp.jobs:
 			if !ok {
 				return
+			}
+
+			for _, filter := range wp.filters {
+				if strings.Contains(job.path, filter) {
+					wp.wg.Done()
+					return
+				}
 			}
 
 			if pw != nil {

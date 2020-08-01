@@ -34,11 +34,13 @@
 * [X] Abstract crawler to allow for different types of crawlers 
 	* [X] Implement HTTP crawler
 		* [X] Implement pdf downloading
+		* [ ] Implement robots.txt check
 	* [ ] Implement Filesystem crawler
 * [X] Abstract writer to allow for different types of writers
 	* [X] Implement disk writer
 	* [ ] Implement memory writer
 	* [ ] Implement database writer
+* [ ] Implement scheduler
 * [ ] Implement compression?
 * [X] Implement filters
 * [ ] Store crawl errors

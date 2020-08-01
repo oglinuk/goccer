@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 var (
@@ -22,7 +21,6 @@ type DiskStore struct {
 // DiskWriter is a directory containing DiskStores
 type DiskWriter struct {
 	path       string
-	filters    []string
 	diskStores map[string]*DiskStore
 }
 
@@ -42,7 +40,7 @@ func NewDiskStore(fpath string) *DiskStore {
 }
 
 // NewDiskWriter constructor
-func NewDiskWriter(dir string, filts []string) *DiskWriter {
+func NewDiskWriter(dir string) *DiskWriter {
 	if _, err := os.Stat(baseDiskDirName); err != nil {
 		if err = os.MkdirAll(baseDiskDirName, 0777); err != nil {
 			log.Fatalf("crawlers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s",
@@ -58,7 +56,6 @@ func NewDiskWriter(dir string, filts []string) *DiskWriter {
 
 	return &DiskWriter{
 		path:       dir,
-		filters:    filts,
 		diskStores: make(map[string]*DiskStore),
 	}
 }
@@ -66,12 +63,6 @@ func NewDiskWriter(dir string, filts []string) *DiskWriter {
 // Write paths to disk
 func (dw *DiskWriter) Write(paths []string) error {
 	for _, p := range paths {
-		for _, f := range dw.filters {
-			if strings.Contains(strings.ToLower(p), f) {
-				return nil
-			}
-		}
-
 		u, err := url.Parse(p)
 		if err != nil {
 			return err

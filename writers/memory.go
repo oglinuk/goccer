@@ -8,7 +8,6 @@ type MemoryStore struct {
 // MemoryWriter is a base path and its subpaths
 type MemoryWriter struct {
 	base         string
-	filts        []string
 	memoryStores map[string]*MemoryStore
 }
 
@@ -20,10 +19,9 @@ func NewMemoryStore() *MemoryStore {
 }
 
 // NewMemoryWriter constructor
-func NewMemoryWriter(basePath string, filters []string) *MemoryWriter {
+func NewMemoryWriter(basePath string) *MemoryWriter {
 	return &MemoryWriter{
 		base:         basePath,
-		filts:        filters,
 		memoryStores: make(map[string]*MemoryStore),
 	}
 }

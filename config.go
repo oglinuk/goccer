@@ -7,7 +7,43 @@ import (
 )
 
 const (
-	configName string = "config.json"
+	configName string = "cfg.json"
+)
+
+var (
+	defaultHTTPDisk = &Config{
+		MaxWorkers: runtime.GOMAXPROCS(0),
+		Crawler:    "http",
+		Writer:     "disk",
+		Filters: []string{
+			"facebook",
+			"instagram",
+			"google",
+			"youtube",
+			"amazon",
+			"microsoft",
+			"apple",
+			"wikipedia",
+		},
+		Paths: []string{
+			"https://en.wikipedia.org/wiki/Chaos_Theory",
+			"https://en.wikipedia.org/wiki/Machine_Learning",
+		},
+	}
+
+	defaultFsDisk = &Config{
+		MaxWorkers: runtime.GOMAXPROCS(0),
+		Crawler:    "fs",
+		Writer:     "disk",
+		Filters: []string{
+			".cache",
+			".config",
+			".Trash",
+		},
+		Paths: []string{
+			"/home",
+		},
+	}
 )
 
 // Config file
@@ -39,24 +75,8 @@ func LoadConfig() (Config, error) {
 	var cf Config
 	f, err := os.Open(configName)
 	if err != nil {
-		SaveConfig(&Config{
-			MaxWorkers: runtime.GOMAXPROCS(0),
-			Crawler:    "http",
-			Writer:     "disk",
-			Filters: []string{
-				"facebook",
-				"instagram",
-				"google",
-				"youtube",
-				"amazon",
-				"microsoft",
-				"apple",
-			},
-			Paths: []string{
-				"https://en.wikipedia.org/wiki/Chaos_Theory",
-				"https://en.wikipedia.org/wiki/Machine_Learning",
-			},
-		})
+		// TODO: Allow choice for default config file
+		SaveConfig(defaultHTTPDisk)
 		return cf, err
 	}
 	defer f.Close()
