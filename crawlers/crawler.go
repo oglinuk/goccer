@@ -9,13 +9,16 @@ type Crawler interface {
 
 // CreateCrawler of ctype with given path
 func CreateCrawler(ctype, path string) Crawler {
+	var c Crawler
+
 	switch ctype {
 	case "http":
-		return NewHTTPCrawler(path)
+		c = NewHTTPCrawler(path)
 	case "fs":
-		return NewFSCrawler(path)
+		c = NewFSCrawler(path)
 	default:
-		log.Printf("crawler.go::CreateCrawler(%s, ...)::ERROR: Invalid crawler type", ctype)
-		return nil
+		log.Fatalf("crawler.go::CreateCrawler(%s, ...)::ERROR: Invalid crawler type", ctype)
 	}
+
+	return c
 }

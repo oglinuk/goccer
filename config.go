@@ -10,6 +10,7 @@ const (
 	configName string = "cfg.json"
 )
 
+// Default configurations
 var (
 	defaultHTTPDisk = &Config{
 		MaxWorkers: runtime.GOMAXPROCS(0),
@@ -23,7 +24,6 @@ var (
 			"amazon",
 			"microsoft",
 			"apple",
-			"wikipedia",
 		},
 		Paths: []string{
 			"https://en.wikipedia.org/wiki/Chaos_Theory",

@@ -74,23 +74,21 @@ func consume(wp WorkerPool) {
 
 			for _, filter := range wp.filters {
 				if strings.Contains(job.path, filter) {
+					log.Printf("Filtered: %s", job.path)
 					wp.wg.Done()
 					return
 				}
 			}
 
-			if pw != nil {
-				pw.Write([]string{job.path})
-			}
+			pw.Write([]string{job.path})
 
 			c := crawlers.CreateCrawler(wp.crawler, job.path)
-			if c != nil && rw != nil {
-				collection := c.Crawl()
-				if collection != nil {
-					rw.Write(collection)
-					log.Printf("Collected %d paths from %s ...", len(collection), job.path)
-				}
+			collection := c.Crawl()
+			if collection != nil {
+				rw.Write(collection)
+				log.Printf("Collected %d paths from %s ...", len(collection), job.path)
 			}
+
 			wp.wg.Done()
 		}
 	}

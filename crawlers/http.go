@@ -42,8 +42,7 @@ func (c HTTPCrawler) Crawl() []string {
 
 	resp, err := client.Get(c.seed)
 	if err != nil {
-		log.Printf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s",
-			c.seed, err.Error())
+		log.Printf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
 		return nil
 	}
 	defer resp.Body.Close()
@@ -59,8 +58,7 @@ func (c HTTPCrawler) Crawl() []string {
 			pdfName := fmt.Sprintf("data/%s", splitPath[len(splitPath)-1])
 			pdf, err := os.Create(pdfName)
 			if err != nil {
-				log.Printf("crawlers::http.go::Crawl::os.Create(%s)::ERROR: %s",
-					pdfName, err.Error())
+				log.Printf("crawlers::http.go::Crawl::os.Create(%s)::ERROR: %s", pdfName, err.Error())
 				return nil
 			}
 			defer pdf.Close()

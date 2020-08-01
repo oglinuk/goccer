@@ -11,13 +11,16 @@ type Writer interface {
 
 // CreateWriter of wtype
 func CreateWriter(wtype, path string) Writer {
+	var w Writer
+
 	switch wtype {
 	case "disk":
-		return NewDiskWriter(path)
+		w = NewDiskWriter(path)
 	case "memory":
-		return NewMemoryWriter(path)
+		w = NewMemoryWriter(path)
 	default:
-		log.Printf("writer.go::CreateWriter(%s, ...)::ERROR: Invalid crawler type", wtype)
-		return nil
+		log.Fatalf("writer.go::CreateWriter(%s, ...)::ERROR: Invalid crawler type", wtype)
 	}
+
+	return w
 }
