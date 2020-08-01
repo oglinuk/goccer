@@ -75,8 +75,18 @@ func LoadConfig() (Config, error) {
 	var cf Config
 	f, err := os.Open(configName)
 	if err != nil {
-		// TODO: Allow choice for default config file
-		SaveConfig(defaultHTTPDisk)
+		var cfg *Config
+
+		switch *config {
+		case "httpdisk":
+			cfg = defaultHTTPDisk
+		case "fsdisk":
+			cfg = defaultFsDisk
+		default:
+			cfg = defaultHTTPDisk
+		}
+
+		SaveConfig(cfg)
 		return cf, err
 	}
 	defer f.Close()
