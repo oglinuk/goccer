@@ -1,4 +1,4 @@
-package writers
+package disk
 
 import (
 	"fmt"
@@ -8,60 +8,51 @@ import (
 	"path/filepath"
 )
 
-var (
-	baseDiskDirName = "data"
-)
-
-// DiskStore is self explanitory
-type DiskStore struct {
+// HTTPStore is a file and a map containing paths in the file
+type HTTPStore struct {
 	file  *os.File
 	paths map[string]struct{}
 }
 
-// DiskWriter is a directory containing DiskStores
-type DiskWriter struct {
+// HTTPWriter is a directory and a map containing Stores
+type HTTPWriter struct {
 	path       string
-	diskStores map[string]*DiskStore
+	diskStores map[string]*HTTPStore
 }
 
-// NewDiskStore constructor
-// TODO: Figure out why there is an inconsistent number of files when crawling
-// the two default config.json seeds
-func NewDiskStore(fpath string) *DiskStore {
+// NewHTTPDiskStore constructor
+func NewHTTPDiskStore(fpath string) *HTTPStore {
 	file, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Printf("crawlers::disk.go::NewDiskWriter::os.OpenFile(%s)::ERROR: %s",
-			fpath, err.Error())
+		log.Printf("writers::disk.go::NewDiskWriter::os.OpenFile(%s)::ERROR: %s", fpath, err.Error())
 	}
-	return &DiskStore{
+	return &HTTPStore{
 		file:  file,
 		paths: make(map[string]struct{}),
 	}
 }
 
-// NewDiskWriter constructor
-func NewDiskWriter(dir string) *DiskWriter {
+// NewHTTPDiskWriter constructor
+func NewHTTPDiskWriter(dir string) *HTTPWriter {
 	if _, err := os.Stat(baseDiskDirName); err != nil {
 		if err = os.MkdirAll(baseDiskDirName, 0777); err != nil {
-			log.Fatalf("crawlers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s",
-				baseDiskDirName, err.Error())
+			log.Fatalf("writers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s", baseDiskDirName, err.Error())
 		}
 	}
 
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
-		log.Printf("crawlers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s",
-			dir, err.Error())
+		log.Printf("writers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s", dir, err.Error())
 	}
 
-	return &DiskWriter{
+	return &HTTPWriter{
 		path:       dir,
-		diskStores: make(map[string]*DiskStore),
+		diskStores: make(map[string]*HTTPStore),
 	}
 }
 
-// Write paths to disk
-func (dw *DiskWriter) Write(paths []string) error {
+// Write http paths to disk
+func (dw *HTTPWriter) Write(paths []string) error {
 	for _, p := range paths {
 		u, err := url.Parse(p)
 		if err != nil {
@@ -75,7 +66,7 @@ func (dw *DiskWriter) Write(paths []string) error {
 		fpath := filepath.Join(dw.path, base)
 
 		if _, ok := dw.diskStores[base]; !ok {
-			dw.diskStores[base] = NewDiskStore(fpath)
+			dw.diskStores[base] = NewHTTPDiskStore(fpath)
 		}
 
 		ds := dw.diskStores[base]

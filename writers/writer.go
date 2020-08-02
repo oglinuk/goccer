@@ -2,6 +2,8 @@ package writers
 
 import (
 	"log"
+
+	"github.com/oglinuk/goccer/writers/disk"
 )
 
 // Writer is a thing that writes the given path to somewhere
@@ -10,12 +12,12 @@ type Writer interface {
 }
 
 // CreateWriter of wtype
-func CreateWriter(wtype, path string) Writer {
+func CreateWriter(ctype, wtype, path string) Writer {
 	var w Writer
 
 	switch wtype {
 	case "disk":
-		w = NewDiskWriter(path)
+		w = disk.CreateDiskWriter(ctype, path)
 	case "memory":
 		w = NewMemoryWriter(path)
 	default:

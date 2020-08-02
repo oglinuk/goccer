@@ -62,8 +62,8 @@ func (wp WorkerPool) check(path string) bool {
 
 // consume all queued jobs in the WorkerPool
 func consume(wp WorkerPool) {
-	pw := writers.CreateWriter(wp.writer, "data/parsed")
-	rw := writers.CreateWriter(wp.writer, "data/raw")
+	pw := writers.CreateWriter(wp.crawler, wp.writer, "data/parsed")
+	rw := writers.CreateWriter(wp.crawler, wp.writer, "data/raw")
 
 	for {
 		select {

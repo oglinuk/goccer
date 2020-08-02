@@ -1,6 +1,7 @@
 package crawlers
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 )
@@ -28,8 +29,9 @@ func (c FSCrawler) Crawl() []string {
 	}
 
 	for _, info := range infos {
-		log.Printf("Found: %s", info.Name())
-		paths = append(paths, info.Name())
+		path := fmt.Sprintf("%s/%s", c.path, info.Name())
+		log.Printf("Found: %s", path)
+		paths = append(paths, path)
 	}
 
 	return paths
