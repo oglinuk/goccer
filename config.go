@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
+	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -95,4 +98,55 @@ func LoadConfig() (Config, error) {
 	err = decoder.Decode(&cf)
 
 	return cf, err
+}
+
+// Aggregate uncrawled
+func Aggregate() {
+	log.Printf("Starting aggregation ...")
+
+	var paths []string
+
+	err := filepath.Walk("data/raw", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			f, err := os.Open(path)
+			if err != nil {
+				log.Printf("config.go::Aggregate::os.Open(%s)::ERROR: %s", path, err.Error())
+			}
+			defer f.Close()
+
+			bs := bufio.NewScanner(f)
+			for bs.Scan() {
+				paths = append(paths, bs.Text())
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Fatalf("Failed to aggregate ...")
+	}
+
+	// TODO: Change below to read current cfg file, since *config wont be set
+	// Im too lazy to do right now ...
+	var cfg *Config
+
+	switch *config {
+	case "httpdisk":
+		cfg = defaultHTTPDisk
+	case "fsdisk":
+		cfg = defaultFsDisk
+	default:
+		cfg = defaultFsDisk
+	}
+
+	cfg.Paths = paths
+
+	SaveConfig(cfg)
+
+	os.RemoveAll("data/raw")
 }

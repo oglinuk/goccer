@@ -15,6 +15,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+var (
+	pdfDir = "data/pdfs"
+)
+
 // HTTPCrawler for HTTP URLs
 type HTTPCrawler struct {
 	seed string
@@ -54,8 +58,14 @@ func (c HTTPCrawler) Crawl() []string {
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		if strings.Contains(resp.Header.Get("Content-Type"), "application/pdf") {
+			if _, err := os.Stat(pdfDir); err != nil {
+				if err = os.MkdirAll(pdfDir, 0777); err != nil {
+					log.Fatalf("crawlers::http.go::Crawl::os.MkdirAll(%s)::ERROR: %s", pdfDir, err.Error())
+				}
+			}
+
 			splitPath := strings.Split(c.seed, "/")
-			pdfName := fmt.Sprintf("data/%s", splitPath[len(splitPath)-1])
+			pdfName := fmt.Sprintf("%s/%s", pdfDir, splitPath[len(splitPath)-1])
 			pdf, err := os.Create(pdfName)
 			if err != nil {
 				log.Printf("crawlers::http.go::Crawl::os.Create(%s)::ERROR: %s", pdfName, err.Error())
@@ -72,7 +82,7 @@ func (c HTTPCrawler) Crawl() []string {
 			collected = append(collected, URL)
 		}
 	} else {
-		log.Printf("crawlers::http.go::Crawl::resp.StatusCode: %d", resp.StatusCode)
+		log.Printf("crawlers::http.go::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
 		return nil
 	}
 

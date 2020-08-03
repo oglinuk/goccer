@@ -9,6 +9,10 @@ import (
 	"github.com/oglinuk/goccer/writers"
 )
 
+var (
+	pathCount uint64
+)
+
 // Job to be crawled
 type Job struct {
 	path string
@@ -46,6 +50,8 @@ func InitProducer(cfg Config) {
 	}
 	wp.wg.Wait()
 	close(wp.jobs)
+
+	log.Printf("Collected a total of %d paths ...", pathCount)
 }
 
 // check if path contains any of the wp.filters
@@ -87,6 +93,7 @@ func consume(wp WorkerPool) {
 			if collection != nil {
 				rw.Write(collection)
 				log.Printf("Collected %d paths from %s ...", len(collection), job.path)
+				pathCount = pathCount + uint64(len(collection))
 			}
 
 			wp.wg.Done()

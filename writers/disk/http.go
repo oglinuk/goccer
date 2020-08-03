@@ -24,7 +24,7 @@ type HTTPWriter struct {
 func NewHTTPDiskStore(fpath string) *HTTPStore {
 	file, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Printf("writers::disk.go::NewDiskWriter::os.OpenFile(%s)::ERROR: %s", fpath, err.Error())
+		log.Printf("writers::disk::fs.go::NewHTTPDiskStore::os.OpenFile(%s)::ERROR: %s", fpath, err.Error())
 	}
 	return &HTTPStore{
 		file:  file,
@@ -36,13 +36,13 @@ func NewHTTPDiskStore(fpath string) *HTTPStore {
 func NewHTTPDiskWriter(dir string) *HTTPWriter {
 	if _, err := os.Stat(baseDiskDirName); err != nil {
 		if err = os.MkdirAll(baseDiskDirName, 0777); err != nil {
-			log.Fatalf("writers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s", baseDiskDirName, err.Error())
+			log.Fatalf("writers::disk::fs.go::NewHTTPDiskWriter::os.MkdirAll(%s)::ERROR: %s", baseDiskDirName, err.Error())
 		}
 	}
 
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
-		log.Printf("writers::disk.go::NewDiskWriter::os.MkdirAll(%s)::ERROR: %s", dir, err.Error())
+		log.Printf("writers::disk::fs.go::NewHTTPDiskWriter::os.MkdirAll(%s)::ERROR: %s", dir, err.Error())
 	}
 
 	return &HTTPWriter{

@@ -28,7 +28,7 @@
 
 ### With Flags
 
-```./goccer -ct http -wt disk -p https://en.wikipedia.org/wiki/Deep_Learning```
+```./goccer -c httpdisk -p https://en.wikipedia.org/wiki/Deep_Learning```
 
 ## Todo
 * [X] Abstract crawler to allow for different types of crawlers 

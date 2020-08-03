@@ -34,5 +34,7 @@ func main() {
 
 	InitProducer(cfg)
 
+	Aggregate()
+
 	log.Printf("Crawled [%d] in %s ...", len(cfg.Paths), time.Since(timeComplexity))
 }
