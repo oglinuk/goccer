@@ -1,40 +1,22 @@
 package main
 
 import (
-	"io"
+	"fmt"
 	"log"
-	"os"
-	"time"
+
+	goccer "./include"
 )
-
-var (
-	timeComplexity time.Time
-)
-
-func init() {
-	timeComplexity = time.Now()
-
-	logFile, err := os.OpenFile("logs.log", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
-	if err != nil {
-		log.Fatalf("main.go::init::os.OpenFile::ERROR: %s", err.Error())
-	}
-
-	mw := io.MultiWriter(os.Stdout, logFile)
-
-	log.SetOutput(mw)
-
-	ParseFlags()
-}
 
 func main() {
-	cfg, err := LoadConfig()
+	c := goccer.NewHTTPCrawler("https://en.wikipedia.org/wiki/Deep_Learning")
+
+	collected, err := c.Crawl()
 	if err != nil {
-		log.Fatalf("main.go::main::LoadConfig::ERROR: %s", err.Error())
+		log.Fatalf("Failed to c.Crawl: %s", err.Error())
 	}
 
-	InitProducer(cfg)
-
-	Aggregate()
-
-	log.Printf("Crawled [%d] in %s ...", len(cfg.Paths), time.Since(timeComplexity))
+	for _, link := range collected {
+		fmt.Printf("%s\n", link)
+	}
+	fmt.Printf("Collected %d links ...\n", len(collected))
 }

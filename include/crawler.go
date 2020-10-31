@@ -1,13 +1,12 @@
-package crawlers
+package goccer
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -32,7 +31,7 @@ func NewHTTPCrawler(s string) HTTPCrawler {
 }
 
 // Crawl c.seed and extract all URLs
-func (c HTTPCrawler) Crawl() []string {
+func (c HTTPCrawler) Crawl() ([]string, error) {
 	var collected []string
 
 	client := http.Client{
@@ -46,47 +45,27 @@ func (c HTTPCrawler) Crawl() []string {
 
 	resp, err := client.Get(c.seed)
 	if err != nil {
-		log.Printf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
-		return nil
+		err = fmt.Errorf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp == nil {
-		log.Println("crawlers::http.go::Crawl::resp::NIL")
-		return nil
+		err = errors.New("crawlers::http.go::Crawl::resp::NIL")
+		return nil, err
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		if strings.Contains(resp.Header.Get("Content-Type"), "application/pdf") {
-			if _, err := os.Stat(pdfDir); err != nil {
-				if err = os.MkdirAll(pdfDir, 0777); err != nil {
-					log.Fatalf("crawlers::http.go::Crawl::os.MkdirAll(%s)::ERROR: %s", pdfDir, err.Error())
-				}
-			}
-
-			splitPath := strings.Split(c.seed, "/")
-			pdfName := fmt.Sprintf("%s/%s", pdfDir, splitPath[len(splitPath)-1])
-			pdf, err := os.Create(pdfName)
-			if err != nil {
-				log.Printf("crawlers::http.go::Crawl::os.Create(%s)::ERROR: %s", pdfName, err.Error())
-				return nil
-			}
-			defer pdf.Close()
-
-			io.Copy(pdf, resp.Body)
-
-			return nil
-		}
-
 		for _, URL := range c.extract(resp) {
 			collected = append(collected, URL)
+			//log.Printf("[COLLECTED] %s", URL)
 		}
 	} else {
-		log.Printf("crawlers::http.go::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
-		return nil
+		err = fmt.Errorf("crawlers::http.go::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
+		return nil, err
 	}
 
-	return collected
+	return collected, nil
 }
 
 func (c HTTPCrawler) extract(resp *http.Response) []string {
