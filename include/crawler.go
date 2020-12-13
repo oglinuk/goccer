@@ -52,21 +52,20 @@ func (c HTTPCrawler) Crawl() ([]string, error) {
 			defer c.wg.Done()
 			resp, err := client.Get(seed)
 			if err != nil {
-				log.Printf("crawlers::http.go::Crawl::client.Get(%s)::ERROR: %s", seed, err.Error())
+				log.Printf("crawlers::Crawl::client.Get(%s)::ERROR: %s", seed, err.Error())
 			}
 			defer resp.Body.Close()
 
 			if resp == nil {
-				log.Printf("crawlers::http.go::Crawl::resp::NIL")
+				log.Printf("crawlers::Crawl::resp::NIL")
 			}
 
 			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 				for _, URL := range c.extract(resp, seed) {
 					collected = append(collected, URL)
-					log.Printf("[COLLECTED] %s", URL)
 				}
 			} else {
-				err = fmt.Errorf("crawlers::http.go::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, seed)
+				err = fmt.Errorf("crawlers::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, seed)
 			}
 		}(seed)
 	}

@@ -24,7 +24,6 @@ func (wp *WorkerPool) check(path string) bool {
 	if _, exists := wp.filters[path]; exists {
 		return true
 	}
-
 	return false
 }
 
@@ -38,7 +37,6 @@ func (wp *WorkerPool) consume() {
 			}
 
 			for _, path := range job.paths {
-
 				if wp.check(path) {
 					log.Printf("Filtered: %s", path)
 					wp.wg.Done()
@@ -53,6 +51,7 @@ func (wp *WorkerPool) consume() {
 			c := NewHTTPCrawler(job.paths)
 			collection, err := c.Crawl()
 			if err != nil {
+				log.Printf("queue.go::c.Crawl::ERROR: %s", err.Error())
 				return // TODO: Need to do better ...
 			}
 			if collection != nil {
@@ -68,9 +67,9 @@ func (wp *WorkerPool) consume() {
 func (wp *WorkerPool) Queue(paths []string) []string {
 	wp.jobs <- Job{paths: paths}
 	wp.wg.Wait()
-	//close(wp.jobs)
-
-	return wp.w.GetRoots()
+	roots := wp.w.GetRoots()
+	wp.w.roots = make(map[string]map[string]struct{})
+	return roots
 }
 
 // InitProducer starts GOMAXPROCS number of consumers
