@@ -15,21 +15,17 @@ import (
 	"golang.org/x/net/html"
 )
 
-var (
-	pdfDir = "data/pdfs"
-)
-
 // HTTPCrawler for HTTP URLs
 type HTTPCrawler struct {
-	seeds []string
-	wg    *sync.WaitGroup
+	seed string
+	wg   *sync.WaitGroup
 }
 
 // NewHTTPCrawler constructor
-func NewHTTPCrawler(s []string) HTTPCrawler {
+func NewHTTPCrawler(s string) HTTPCrawler {
 	return HTTPCrawler{
-		seeds: s,
-		wg:    &sync.WaitGroup{},
+		seed: s,
+		wg:   &sync.WaitGroup{},
 	}
 }
 
@@ -46,35 +42,28 @@ func (c HTTPCrawler) Crawl() ([]string, error) {
 		Timeout: time.Second * 7,
 	}
 
-	for _, seed := range c.seeds {
-		c.wg.Add(1)
-		go func(seed string) {
-			defer c.wg.Done()
-			resp, err := client.Get(seed)
-			if err != nil {
-				log.Printf("crawlers::Crawl::client.Get(%s)::ERROR: %s", seed, err.Error())
-			}
-			defer resp.Body.Close()
+	resp, err := client.Get(c.seed)
+	if err != nil {
+		log.Printf("crawlers::Crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+	}
+	defer resp.Body.Close()
 
-			if resp == nil {
-				log.Printf("crawlers::Crawl::resp::NIL")
-			}
-
-			if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-				for _, URL := range c.extract(resp, seed) {
-					collected = append(collected, URL)
-				}
-			} else {
-				err = fmt.Errorf("crawlers::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, seed)
-			}
-		}(seed)
+	if resp == nil {
+		log.Printf("crawlers::Crawl::resp::NIL")
 	}
 
-	c.wg.Wait()
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		for _, URL := range c.extract(resp, c.seed) {
+			collected = append(collected, URL)
+		}
+	} else {
+		err = fmt.Errorf("crawlers::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
+	}
 
 	return collected, nil
 }
 
+// extract links from resp
 func (c HTTPCrawler) extract(resp *http.Response, seed string) []string {
 	if resp == nil {
 		return nil
@@ -92,6 +81,7 @@ func (c HTTPCrawler) extract(resp *http.Response, seed string) []string {
 	return rebuiltLinks
 }
 
+// collectLinks from httpBody
 func collectLinks(httpBody io.Reader) []string {
 	links := make(map[string]struct{})
 	col := []string{}
@@ -111,13 +101,18 @@ func collectLinks(httpBody io.Reader) []string {
 				if attr.Key == "href" {
 					tl := trimHash(attr.Val)
 					col = append(col, tl)
-					resolv(links, col)
+					for _, link := range col {
+						if _, exists := links[link]; !exists {
+							links[link] = struct{}{}
+						}
+					}
 				}
 			}
 		}
 	}
 }
 
+// trimHash of (l)ink
 func trimHash(l string) string {
 	if strings.Contains(l, "#") {
 		for n, str := range l {
@@ -129,14 +124,7 @@ func trimHash(l string) string {
 	return l
 }
 
-func resolv(lm map[string]struct{}, ml []string) {
-	for _, str := range ml {
-		if _, exists := lm[str]; !exists {
-			lm[str] = struct{}{}
-		}
-	}
-}
-
+// rebuildURL using href and base
 func rebuildURL(href, base string) string {
 	url, err := url.Parse(href)
 	if err != nil {

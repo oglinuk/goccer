@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	goccer "./include"
@@ -17,16 +16,26 @@ func init() {
 }
 
 func main() {
-	c := goccer.NewHTTPCrawler([]string{
+	filters := map[string]struct{}{
+		"facebook":  {},
+		"instagram": {},
+		"google":    {},
+		"youtube":   {},
+		"amazon":    {},
+		"microsoft": {},
+		"apple":     {},
+	}
+
+	wp := goccer.NewWorkerPool(filters)
+	wp.InitProducer()
+
+	seeds := []string{
 		"https://en.wikipedia.org/wiki/Deep_Learning",
 		"https://en.wikipedia.org/wiki/Web_search_engine",
 		"https://en.wikipedia.org/wiki/Chaos_Theory",
-	})
-
-	collected, err := c.Crawl()
-	if err != nil {
-		log.Fatalf("Failed to c.Crawl: %s", err.Error())
 	}
+
+	collected := wp.Queue(seeds)
 
 	for _, link := range collected {
 		fmt.Printf("%s\n", link)

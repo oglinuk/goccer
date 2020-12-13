@@ -46,25 +46,26 @@ func (wp *WorkerPool) consume() {
 				if _, exists := wp.w.roots[path]; !exists {
 					wp.w.Write([]string{path})
 				}
-			}
 
-			c := NewHTTPCrawler(job.paths)
-			collection, err := c.Crawl()
-			if err != nil {
-				log.Printf("queue.go::c.Crawl::ERROR: %s", err.Error())
-				return // TODO: Need to do better ...
-			}
-			if collection != nil {
-				wp.w.Write(collection)
-			}
+				c := NewHTTPCrawler(path)
+				collection, err := c.Crawl()
+				if err != nil {
+					log.Printf("queue.go::c.Crawl::ERROR: %s", err.Error())
+					return // TODO: Need to do better ...
+				}
+				if collection != nil {
+					wp.w.Write(collection)
+				}
 
-			wp.wg.Done()
+				wp.wg.Done()
+			}
 		}
 	}
 }
 
 // Queue paths
 func (wp *WorkerPool) Queue(paths []string) []string {
+	wp.wg.Add(len(paths))
 	wp.jobs <- Job{paths: paths}
 	wp.wg.Wait()
 	roots := wp.w.GetRoots()
