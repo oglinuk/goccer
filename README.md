@@ -1,5 +1,3 @@
----
-title: Goccer
----
+# Goccer
 
 Go concurrent crawler(s).

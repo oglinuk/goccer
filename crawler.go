@@ -4,33 +4,29 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"golang.org/x/net/html"
 )
 
-// HTTPCrawler for HTTP URLs
-type HTTPCrawler struct {
+// httpCrawler for HTTP URLs
+type httpCrawler struct {
 	seed string
-	wg   *sync.WaitGroup
 }
 
-// NewHTTPCrawler constructor
-func NewHTTPCrawler(s string) HTTPCrawler {
-	return HTTPCrawler{
+// newHTTPCrawler constructor
+func newHTTPCrawler(s string) httpCrawler {
+	return httpCrawler{
 		seed: s,
-		wg:   &sync.WaitGroup{},
 	}
 }
 
-// Crawl c.seed and extract all URLs
-func (c HTTPCrawler) Crawl() ([]string, error) {
+// crawl c.seed and extract all URLs
+func (c httpCrawler) crawl() ([]string, error) {
 	var collected []string
 
 	client := &http.Client{
@@ -44,12 +40,12 @@ func (c HTTPCrawler) Crawl() ([]string, error) {
 
 	resp, err := client.Get(c.seed)
 	if err != nil {
-		log.Printf("crawlers::Crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+		return nil, fmt.Errorf("crawlers::crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
 	}
 	defer resp.Body.Close()
 
 	if resp == nil {
-		log.Printf("crawlers::Crawl::resp::NIL")
+		return nil, fmt.Errorf("crawlers::crawl::resp::NIL")
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
@@ -57,14 +53,14 @@ func (c HTTPCrawler) Crawl() ([]string, error) {
 			collected = append(collected, URL)
 		}
 	} else {
-		err = fmt.Errorf("crawlers::Crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
+		return nil, fmt.Errorf("crawlers::crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
 	}
 
 	return collected, nil
 }
 
 // extract links from resp
-func (c HTTPCrawler) extract(resp *http.Response, seed string) []string {
+func (c httpCrawler) extract(resp *http.Response, seed string) []string {
 	if resp == nil {
 		return nil
 	}

@@ -16,7 +16,7 @@ type WorkerPool struct {
 	jobs    chan Job
 	wg      *sync.WaitGroup
 	filters map[string]struct{}
-	w       *MemoryPool
+	w       *memoryPool
 }
 
 // check if path contains any of the wp.filters
@@ -44,17 +44,18 @@ func (wp *WorkerPool) consume() {
 				}
 
 				if _, exists := wp.w.roots[path]; !exists {
-					wp.w.Write([]string{path})
+					wp.w.write([]string{path})
 				}
 
-				c := NewHTTPCrawler(path)
-				collection, err := c.Crawl()
+				c := newHTTPCrawler(path)
+				collection, err := c.crawl()
 				if err != nil {
-					log.Printf("queue.go::c.Crawl::ERROR: %s", err.Error())
+					log.Printf("queue.go::c.crawl::ERROR: %s", err.Error())
 					return // TODO: Need to do better ...
 				}
+
 				if collection != nil {
-					wp.w.Write(collection)
+					wp.w.write(collection)
 				}
 
 				wp.wg.Done()
@@ -68,8 +69,10 @@ func (wp *WorkerPool) Queue(paths []string) []string {
 	wp.wg.Add(len(paths))
 	wp.jobs <- Job{paths: paths}
 	wp.wg.Wait()
-	roots := wp.w.GetRoots()
-	wp.w.roots = make(map[string]map[string]struct{})
+
+	roots := wp.w.getRoots()
+	//wp.w.roots = make(map[string]map[string]struct{})
+
 	return roots
 }
 
@@ -86,6 +89,6 @@ func NewWorkerPool(filters map[string]struct{}) *WorkerPool {
 		jobs:    make(chan Job),
 		wg:      &sync.WaitGroup{},
 		filters: filters,
-		w:       NewMemoryPool(),
+		w:       newMemoryPool(),
 	}
 }

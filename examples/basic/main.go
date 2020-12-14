@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	goccer "./include"
+	goccer "github.com/OGLinuk/goccer"
 )
 
 var (
