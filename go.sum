@@ -1,3 +1,5 @@
+gitlab.com/rwxrob/cmdtab v0.2.1-alpha h1:QzrJ9hDqrl5EByqrtmc4/NaVWqu3TGIYa8Jvp7qNeO8=
+gitlab.com/rwxrob/cmdtab v0.2.1-alpha/go.mod h1:E+x6E5YdLBDcPcQ1uvpVdAutOvKKD9OsoNdjZn3FL7A=
 golang.org/x/net v0.0.0-20201209123823-ac852fbbde11 h1:lwlPPsmjDKK0J6eG6xDWd5XPehI0R024zxjDnw3esPA=
 golang.org/x/net v0.0.0-20201209123823-ac852fbbde11/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

@@ -71,7 +71,6 @@ func (wp *WorkerPool) Queue(paths []string) []string {
 	wp.wg.Wait()
 
 	roots := wp.w.getRoots()
-	//wp.w.roots = make(map[string]map[string]struct{})
 
 	return roots
 }
