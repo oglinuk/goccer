@@ -50,7 +50,7 @@ func (wp *WorkerPool) consume() {
 				c := newHTTPCrawler(path)
 				collection, err := c.crawl()
 				if err != nil {
-					log.Printf("queue.go::c.crawl::ERROR: %s", err.Error())
+					log.Printf("consume::c.crawl: %s", err.Error())
 					return // TODO: Need to do better ...
 				}
 

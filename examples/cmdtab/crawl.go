@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/OGLinuk/goccer"
-	"gitlab.com/rwxrob/cmdtab"
+	"github.com/rwxrob/cmdtab"
 )
 
 func init() {

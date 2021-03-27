@@ -40,12 +40,12 @@ func (c httpCrawler) crawl() ([]string, error) {
 
 	resp, err := client.Get(c.seed)
 	if err != nil {
-		return nil, fmt.Errorf("crawlers::crawl::client.Get(%s)::ERROR: %s", c.seed, err.Error())
+		return nil, fmt.Errorf("crawl::client.Get(%s): %s", c.seed, err.Error())
 	}
 	defer resp.Body.Close()
 
 	if resp == nil {
-		return nil, fmt.Errorf("crawlers::crawl::resp::NIL")
+		return nil, fmt.Errorf("crawl::resp::NIL")
 	}
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
@@ -53,7 +53,7 @@ func (c httpCrawler) crawl() ([]string, error) {
 			collected = append(collected, URL)
 		}
 	} else {
-		return nil, fmt.Errorf("crawlers::crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
+		return nil, fmt.Errorf("crawl::resp.StatusCode(%d): %s", resp.StatusCode, c.seed)
 	}
 
 	return collected, nil
