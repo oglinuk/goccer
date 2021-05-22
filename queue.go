@@ -6,29 +6,32 @@ import (
 	"sync"
 )
 
-// Job to be crawled
-type Job struct {
+type job struct {
 	paths []string
 }
 
-// WorkerPool that consumes jobs
-type WorkerPool struct {
-	jobs    chan Job
-	wg      *sync.WaitGroup
-	filters map[string]struct{}
-	w       *memoryPool
+type workerpool struct {
+	jobs chan job
+	wg   *sync.WaitGroup
+	w    *memoryPool
 }
 
-// check if path contains any of the wp.filters
-func (wp *WorkerPool) check(path string) bool {
-	if _, exists := wp.filters[path]; exists {
-		return true
+// NewWorkerpool constructor
+func NewWorkerpool() *workerpool {
+	wp := &workerpool{
+		jobs: make(chan job),
+		wg:   &sync.WaitGroup{},
+		w:    NewMemorypool(),
 	}
-	return false
+
+	for i := 0; i <= runtime.GOMAXPROCS(0); i++ {
+		go wp.consume()
+	}
+
+	return wp
 }
 
-// consume all queued jobs in the WorkerPool
-func (wp *WorkerPool) consume() {
+func (wp *workerpool) consume() {
 	for {
 		select {
 		case job, ok := <-wp.jobs:
@@ -37,57 +40,23 @@ func (wp *WorkerPool) consume() {
 			}
 
 			for _, path := range job.paths {
-				if wp.check(path) {
-					log.Printf("Filtered: %s", path)
-					wp.wg.Done()
-					return
+				c := NewCrawler(path)
+				collected := c.Crawl()
+				if c.Err != nil {
+					log.Printf("queue.go::consume::c.Crawl: %s", c.Err.Error())
 				}
-
-				if _, exists := wp.w.roots[path]; !exists {
-					wp.w.write([]string{path})
-				}
-
-				c := newHTTPCrawler(path)
-				collection, err := c.crawl()
-				if err != nil {
-					log.Printf("consume::c.crawl: %s", err.Error())
-					return // TODO: Need to do better ...
-				}
-
-				if collection != nil {
-					wp.w.write(collection)
-				}
-
+				wp.w.write(collected)
 				wp.wg.Done()
 			}
 		}
 	}
 }
 
-// Queue paths
-func (wp *WorkerPool) Queue(paths []string) []string {
-	wp.wg.Add(len(paths))
-	wp.jobs <- Job{paths: paths}
+// Queue (p)ath(s) to be crawled
+func (wp *workerpool) Queue(ps []string) []string {
+	wp.wg.Add(len(ps))
+	wp.jobs <- job{paths: ps}
 	wp.wg.Wait()
 
-	roots := wp.w.getRoots()
-
-	return roots
-}
-
-// InitProducer starts GOMAXPROCS number of consumers
-func (wp *WorkerPool) InitProducer() {
-	for i := 0; i <= runtime.GOMAXPROCS(0); i++ {
-		go wp.consume()
-	}
-}
-
-// NewWorkerPool constructor
-func NewWorkerPool(filters map[string]struct{}) *WorkerPool {
-	return &WorkerPool{
-		jobs:    make(chan Job),
-		wg:      &sync.WaitGroup{},
-		filters: filters,
-		w:       newMemoryPool(),
-	}
+	return wp.w.GetPaths()
 }

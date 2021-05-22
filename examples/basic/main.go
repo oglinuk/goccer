@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	goccer "github.com/OGLinuk/goccer"
+	"github.com/oglinuk/goccer"
 )
 
 var (
@@ -16,6 +16,7 @@ func init() {
 }
 
 func main() {
+	/*
 	filters := map[string]struct{}{
 		"facebook":  {},
 		"instagram": {},
@@ -25,9 +26,9 @@ func main() {
 		"microsoft": {},
 		"apple":     {},
 	}
+	*/
 
-	wp := goccer.NewWorkerPool(filters)
-	wp.InitProducer()
+	wp := goccer.NewWorkerpool()
 
 	seeds := []string{
 		"https://en.wikipedia.org/wiki/Deep_Learning",

@@ -5,48 +5,68 @@ import (
 	"net/url"
 )
 
-// memoryPool is a domain and a map containing routes of the domain
 type memoryPool struct {
-	roots map[string]map[string]struct{}
+	// map[domain]map[route]struct{}
+	// map[https://golang.org]map[/pkg/net/http]struct{}
+	mapping map[string]map[string]struct{}
 }
 
-// newMemoryPool constructor
-func newMemoryPool() *memoryPool {
-	return &memoryPool{
-		roots: make(map[string]map[string]struct{}),
+func NewMemorypool() *memoryPool {
+	mp := &memoryPool{
+		mapping: make(map[string]map[string]struct{}),
 	}
+
+	// Initialize a new map for the 'error' key value to allow us to store
+	// URLs that errored
+	mp.mapping["error"] = make(map[string]struct{})
+
+	return mp
 }
 
-// write path domains/routes if not existing already
 func (mp *memoryPool) write(paths []string) error {
 	for _, p := range paths {
-		u, err := url.Parse(p)
+		parsed, err := url.Parse(p)
 		if err != nil {
 			return err
 		}
 
-		domain := u.Hostname()
+		// Extract scheme (http, https, ...)
+		scheme := parsed.Scheme
+
+		// Extract domain (golang.org, fourohfournotfound.com, ...)
+		domain := parsed.Hostname()
+
+		// If the domain fails, track the URL under "error" key
 		if domain == "" || domain == " " {
 			domain = "error"
+			mp.mapping[domain][parsed.String()] = struct{}{}
 		}
 
-		if _, exists := mp.roots[domain]; !exists {
-			mp.roots[domain] = make(map[string]struct{})
+		domain = fmt.Sprintf("%s://%s", scheme, domain)
+		if _, exists := mp.mapping[domain]; !exists {
+			mp.mapping[domain] = make(map[string]struct{})
 		}
-		if _, exists := mp.roots[domain][u.Path]; !exists {
-			mp.roots[domain][u.Path] = struct{}{}
+
+		if len(parsed.Path) > 0 {
+			if _, exists := mp.mapping[domain][parsed.Path]; !exists {
+				mp.mapping[domain][parsed.Path] = struct{}{}
+			}
 		}
 	}
 
 	return nil
 }
 
-func (mp *memoryPool) getRoots() []string {
+// GetPaths returns all paths stored in mp.mapping after rebuilding them
+func (mp *memoryPool) GetPaths() []string {
 	var paths []string
-	for domain := range mp.roots {
-		for route := range mp.roots[domain] {
-			path := fmt.Sprintf("%s%s", domain, route)
-			paths = append(paths, path)
+
+	// TODO: Need to do something else with mp.mapping["errors"]
+	for k := range mp.mapping {
+		if k != "error" {
+			for v := range mp.mapping[k] {
+				paths = append(paths, fmt.Sprintf("%s%s", k, v))
+			}
 		}
 	}
 

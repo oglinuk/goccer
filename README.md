@@ -1,10 +1,3 @@
 # Goccer
 
-Go concurrent crawler(s).
-
-## TODO
-
-* [ ] Write tests
-	* [ ] crawler.go
-	* [ ] queue.go
-	* [ ] writer.go
+Go concurrent crawler(s) library
