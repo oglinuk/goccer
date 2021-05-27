@@ -4,9 +4,10 @@ import (
 	"crypto/tls"
 	"net/http"
 	"os"
-	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -19,17 +20,26 @@ var (
 )
 
 func TestNewCrawler(t *testing.T) {
+	/*
 	if c == nil {
 		t.Errorf("Expected: crawler; Got: nil")
 	}
+	*/
+	assert.NotNil(t, c)
 
+	/*
 	if c.Err != nil {
 		t.Errorf("Expected: nil; Got: %s", c.Err.Error())
 	}
+	*/
+	assert.Nil(t, c.Err)
 
+	/*
 	if c.Root != expectedRoot {
 		t.Errorf("Expected: %s; Got: %s", expectedRoot, c.Root)
 	}
+	*/
+	assert.Equal(t, expectedRoot, c.Root)
 
 	expectedClient := &http.Client{
 		Transport: &http.Transport{
@@ -39,34 +49,52 @@ func TestNewCrawler(t *testing.T) {
 		},
 		Timeout: time.Second * 7,
 	}
+
+	/*
 	if !reflect.DeepEqual(c.Client, expectedClient) {
 		t.Errorf("Expected: %v; Got: %v", expectedClient, c.Client)
 	}
+	*/
+	assert.Equal(t, expectedClient, c.Client)
 }
 
 func TestCrawl(t *testing.T) {
+	failingCrawler := NewCrawler("")
+	_ = failingCrawler.Crawl()
+	assert.NotNil(t, failingCrawler.Err)
+
 	_ = c.Crawl()
-	if c.Err != nil {
-		t.Errorf("Expected: nil; Got: %s", c.Err.Error())
-	}
+	assert.Nil(t, c.Err)
 }
 
 func TestParseHTML(t *testing.T) {
+	assert.Nil(t, c.ParseHTML(nil))
+
 	testHTML, err := os.Open(testHTML)
+	/*
 	if err != nil {
 		t.Errorf("Expected: nil; Got: %s", err.Error())
 	}
+	*/
+	assert.Nil(t, err)
 	defer testHTML.Close()
 
 	parsed := c.ParseHTML(testHTML)
+
+	/*
 	if c.Err != nil {
 		t.Errorf("Expected: nil; Got: %s", c.Err.Error())
 	}
+	*/
+	assert.Nil(t, c.Err)
 
+	/*
 	expectedLen := 1397
 	if len(parsed) != expectedLen {
 		t.Errorf("Expected: %d; Got: %d", expectedLen, len(parsed))
 	}
+	*/
+	assert.Equal(t, 1397, len(parsed))
 }
 
 func TestRebuildURL(t *testing.T) {
@@ -96,8 +124,11 @@ func TestRebuildURL(t *testing.T) {
 	}
 
 	for i, URL := range actualURLs {
+		/*
 		if URL != expectedURLs[i] {
 			t.Errorf("\nExpected: %s\nGot: %s", expectedURLs[i], URL)
 		}
+		*/
+		assert.Equal(t, expectedURLs[i], URL)
 	}
 }

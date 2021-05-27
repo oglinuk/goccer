@@ -2,6 +2,8 @@ package goccer
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -15,14 +17,15 @@ var (
 )
 
 func TestNewWorkerpool(t *testing.T) {
-	if actualWp == nil {
-		t.Error("Expected: something; Got: nil")
-	}
+		assert := assert.New(t)
+		assert.NotNil(t, actualWp)
+		assert.NotNil(t, actualWp.jobs)
+		assert.NotNil(t, actualWp.wg)
+		assert.NotNil(t, actualWp.w)
 }
 
 func TestQueue(t *testing.T) {
-	if len(actualWp.Queue(testURLs)) < 1 {
-		t.Error("Expected > 1; Got < 1")
-	}
+	actualURLs := actualWp.Queue(testURLs)
+	assert.NotNil(t, actualURLs)
 }
 

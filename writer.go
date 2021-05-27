@@ -64,6 +64,7 @@ func (mp *memoryPool) GetPaths() []string {
 	// TODO: Need to do something else with mp.mapping["errors"]
 	for k := range mp.mapping {
 		if k != "error" {
+			paths = append(paths, k)
 			for v := range mp.mapping[k] {
 				paths = append(paths, fmt.Sprintf("%s%s", k, v))
 			}

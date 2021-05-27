@@ -42,6 +42,9 @@ func (wp *workerpool) consume() {
 			for _, path := range job.paths {
 				c := NewCrawler(path)
 				collected := c.Crawl()
+				// TODO: If an error occurs we should parse the error. if the
+				// error is a malformed URL, remove it. If it was a timeout or
+				// something just went wrong, retry the request X(2?) times.
 				if c.Err != nil {
 					log.Printf("queue.go::consume::c.Crawl: %s", c.Err.Error())
 				}
