@@ -1,6 +1,7 @@
 package goccer
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,5 +44,9 @@ func TestGetPaths(t *testing.T) {
 		"https://en.wikipedia.org/wiki/Chaos_theory",
 		"https://en.wikipedia.org/wiki/Deep_learning",
 	}
+
+	sort.Strings(expectedPaths)
+	sort.Strings(actualPaths)
+
 	assert.Equal(t, expectedPaths, actualPaths)
 }
