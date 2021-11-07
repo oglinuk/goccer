@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	expectedRoot = "https://en.wikipedia.org/wiki/Chaos_theory"
+	expectedSeed = "https://en.wikipedia.org/wiki/Chaos_theory"
 	testHTML = "testdata/chaos-theory.html"
 )
 
 var (
-	c = NewCrawler(expectedRoot)
+	c = NewCrawler()
 )
 
 func TestNewCrawler(t *testing.T) {
@@ -26,20 +26,6 @@ func TestNewCrawler(t *testing.T) {
 	}
 	*/
 	assert.NotNil(t, c)
-
-	/*
-	if c.Err != nil {
-		t.Errorf("Expected: nil; Got: %s", c.Err.Error())
-	}
-	*/
-	assert.Nil(t, c.Err)
-
-	/*
-	if c.Root != expectedRoot {
-		t.Errorf("Expected: %s; Got: %s", expectedRoot, c.Root)
-	}
-	*/
-	assert.Equal(t, expectedRoot, c.Root)
 
 	expectedClient := &http.Client{
 		Transport: &http.Transport{
@@ -59,12 +45,11 @@ func TestNewCrawler(t *testing.T) {
 }
 
 func TestCrawl(t *testing.T) {
-	failingCrawler := NewCrawler("")
-	_ = failingCrawler.Crawl()
-	assert.NotNil(t, failingCrawler.Err)
+	_, err := c.Crawl("")
+	assert.Nil(t, err)
 
-	_ = c.Crawl()
-	assert.Nil(t, c.Err)
+	_, err = c.Crawl(expectedSeed)
+	assert.Nil(t, err)
 }
 
 func TestParseHTML(t *testing.T) {
@@ -80,13 +65,6 @@ func TestParseHTML(t *testing.T) {
 	defer testHTML.Close()
 
 	parsed := c.ParseHTML(testHTML)
-
-	/*
-	if c.Err != nil {
-		t.Errorf("Expected: nil; Got: %s", c.Err.Error())
-	}
-	*/
-	assert.Nil(t, c.Err)
 
 	/*
 	expectedLen := 1397

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+main() {
+	go build
+	./stdin < seeds.txt > collected.txt
+}
+
+main
