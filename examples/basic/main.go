@@ -16,18 +16,6 @@ func init() {
 }
 
 func main() {
-	/*
-	filters := map[string]struct{}{
-		"facebook":  {},
-		"instagram": {},
-		"google":    {},
-		"youtube":   {},
-		"amazon":    {},
-		"microsoft": {},
-		"apple":     {},
-	}
-	*/
-
 	wp := goccer.NewWorkerpool()
 
 	seeds := []string{
@@ -37,9 +25,10 @@ func main() {
 	}
 
 	collected := wp.Queue(seeds)
+	t := time.Since(timeComplexity)
 
 	for _, link := range collected {
 		fmt.Printf("%s\n", link)
 	}
-	fmt.Printf("Collected %d links in %s ...\n", len(collected), time.Since(timeComplexity))
+	fmt.Printf("Crawled %d && collected %d links in %s ...\n", len(seeds), len(collected), t)
 }

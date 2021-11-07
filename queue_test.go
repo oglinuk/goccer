@@ -22,6 +22,8 @@ func TestNewWorkerpool(t *testing.T) {
 		assert.NotNil(t, actualWp.jobs)
 		assert.NotNil(t, actualWp.wg)
 		assert.NotNil(t, actualWp.w)
+		assert.NotNil(t, actualWp.c)
+		assert.NotNil(t, actualWp.mu)
 }
 
 func TestQueue(t *testing.T) {

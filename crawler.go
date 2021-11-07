@@ -14,12 +14,11 @@ import (
 // TODO: Abstract below to allow for different types of crawlers (ie: db, fs)
 type crawler struct {
 	Client *http.Client
-	Err error
-	Root string
+	Seed string
 }
 
 // NewCrawler constructor
-func NewCrawler(r string) *crawler {
+func NewCrawler() *crawler {
 	return &crawler{
 		Client: &http.Client{
 			Transport: &http.Transport{
@@ -29,21 +28,24 @@ func NewCrawler(r string) *crawler {
 			},
 			Timeout: time.Second * 7,
 		},
-		Err: nil,
-		Root: r,
 	}
 }
 
 // Crawl the crawlers Root and returns the extracted URLs
-func (c *crawler) Crawl() []string {
-	resp, err := c.Client.Get(c.Root)
+func (c *crawler) Crawl(seed string) ([]string, error) {
+	if seed == "" || seed == " " {
+		return nil, nil
+	}	else {
+		c.Seed = seed
+	}
+
+	resp, err := c.Client.Get(c.Seed)
 	if err != nil {
-		c.Err = err
-		return nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return c.ParseHTML(resp.Body)
+	return c.ParseHTML(resp.Body), nil
 }
 
 // ParseHTML takes an io.Reader (http.Response.Body), extracts all
@@ -87,27 +89,27 @@ func (c *crawler) ParseHTML(body io.Reader) []string {
 
 // RebuildURL returns a string depending on the state of href
 func (c *crawler) RebuildURL(href string) string {
-	var rebuilt string
+	rebuilt := ""
 
 	// check if href is already a valid URL
 	if strings.HasPrefix(href, "http") {
 		rebuilt = href
 	}
 
-	// check if href has '//' prefix
-	if href[0] == '/' && href[1] == '/' {
-		rebuilt = fmt.Sprintf("https:%s", href)
+	// check if href iS '/', '//', or '#'
+	if len(href) < 3 {
+		rebuilt = c.Seed
 	}
 
-	// check if href has '/' prefix
-	if href[0] == '/' && href[1] != '/' {
-		href = strings.TrimPrefix(href, "/")
-		rebuilt = fmt.Sprintf("%s/%s", c.Root, href)
-	}
-
-	// check if href has '#' prefix
-	if href[0] == '#' {
-		rebuilt = fmt.Sprintf("%s%s", c.Root, href)
+	// if we get to this point, rebuild using c.Seed and href
+	if rebuilt == "" {
+		if strings.HasPrefix(href, "//") {
+			rebuilt = fmt.Sprintf("https:%s", href)
+		} else if strings.HasPrefix(href, "/") || strings.HasPrefix(href, "#") {
+			rebuilt = fmt.Sprintf("%s%s", c.Seed, href)
+		} else {
+			rebuilt = fmt.Sprintf("%s/%s", c.Seed, href)
+		}
 	}
 
 	return rebuilt
