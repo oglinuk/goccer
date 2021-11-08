@@ -33,7 +33,7 @@ func TestNewCrawler(t *testing.T) {
 				InsecureSkipVerify: true,
 			},
 		},
-		Timeout: time.Second * 7,
+		Timeout: time.Second * 15,
 	}
 
 	/*
