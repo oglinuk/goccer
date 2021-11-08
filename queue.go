@@ -4,6 +4,7 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"syscall"
 )
 
 type job struct {
@@ -16,6 +17,14 @@ type workerpool struct {
 	w *memoryPool
 	c *crawler
 	mu *sync.Mutex
+}
+
+func init() {
+	// Set the ulimit to max
+	var rLimit syscall.Rlimit
+	syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	rLimit.Cur = rLimit.Max
+	syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
 }
 
 // NewWorkerpool constructor
