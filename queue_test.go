@@ -16,6 +16,8 @@ var (
 	}
 )
 
+
+// TestNewWorkerpool checks that actualWp and all parts are not nil
 func TestNewWorkerpool(t *testing.T) {
 		assert := assert.New(t)
 		assert.NotNil(t, actualWp)
@@ -26,6 +28,7 @@ func TestNewWorkerpool(t *testing.T) {
 		assert.NotNil(t, actualWp.mu)
 }
 
+// TestQueue checks that the result of 3 URLs is not nil
 func TestQueue(t *testing.T) {
 	actualURLs := actualWp.Queue(testURLs)
 	assert.NotNil(t, actualURLs)

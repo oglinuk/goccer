@@ -13,14 +13,14 @@ import (
 
 // TODO: Abstract below to allow for different types of crawlers (ie: db, fs)
 type crawler struct {
-	Client *http.Client
-	Seed string
+	client *http.Client
+	seed string
 }
 
-// NewCrawler constructor
-func NewCrawler() *crawler {
+// newCrawler constructor
+func newCrawler() *crawler {
 	return &crawler{
-		Client: &http.Client{
+		client: &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true,
@@ -31,26 +31,26 @@ func NewCrawler() *crawler {
 	}
 }
 
-// Crawl the crawlers Root and returns the extracted URLs
+// Crawl the given seed and return the URLs from c.parseHTML
 func (c *crawler) Crawl(seed string) ([]string, error) {
 	if seed == "" || seed == " " {
 		return nil, nil
 	}	else {
-		c.Seed = seed
+		c.seed = seed
 	}
 
-	resp, err := c.Client.Get(c.Seed)
+	resp, err := c.client.Get(c.seed)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return c.ParseHTML(resp.Body), nil
+	return c.parseHTML(resp.Body), nil
 }
 
-// ParseHTML takes an io.Reader (http.Response.Body), extracts all
+// parseHTML takes an io.Reader (http.Response.Body), extracts all
 // <a>nchor tags, and returns all rebuilt <a> tags as full URLs
-func (c *crawler) ParseHTML(body io.Reader) []string {
+func (c *crawler) parseHTML(body io.Reader) []string {
 	if body == nil {
 		return nil
 	}
@@ -74,7 +74,7 @@ func (c *crawler) ParseHTML(body io.Reader) []string {
 				// attr can be a valid URL or a route
 				// ie - "https://github.com/afkworks/spec-kn" || "books" || "#cite_note-77"
 				if attr.Key == "href" && attr.Val != "" {
-					rebuilt := c.RebuildURL(attr.Val)
+					rebuilt := c.rebuildURL(attr.Val)
 					if _, exists := checked[rebuilt]; !exists {
 						parsed = append(parsed, rebuilt)
 						checked[rebuilt] = struct{}{}
@@ -87,8 +87,8 @@ func (c *crawler) ParseHTML(body io.Reader) []string {
 	return parsed
 }
 
-// RebuildURL returns a string depending on the state of href
-func (c *crawler) RebuildURL(href string) string {
+// rebuildURL returns a string depending on the state of href
+func (c *crawler) rebuildURL(href string) string {
 	rebuilt := ""
 
 	// check if href is already a valid URL
@@ -98,17 +98,17 @@ func (c *crawler) RebuildURL(href string) string {
 
 	// check if href iS '/', '//', or '#'
 	if len(href) < 3 {
-		rebuilt = c.Seed
+		rebuilt = c.seed
 	}
 
-	// if we get to this point, rebuild using c.Seed and href
+	// if we get to this point, rebuild using c.seed and href
 	if rebuilt == "" {
 		if strings.HasPrefix(href, "//") {
 			rebuilt = fmt.Sprintf("https:%s", href)
 		} else if strings.HasPrefix(href, "/") || strings.HasPrefix(href, "#") {
-			rebuilt = fmt.Sprintf("%s%s", c.Seed, href)
+			rebuilt = fmt.Sprintf("%s%s", c.seed, href)
 		} else {
-			rebuilt = fmt.Sprintf("%s/%s", c.Seed, href)
+			rebuilt = fmt.Sprintf("%s/%s", c.seed, href)
 		}
 	}
 

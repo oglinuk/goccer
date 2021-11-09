@@ -8,15 +8,17 @@ import (
 )
 
 var (
-	actualMp = NewMemorypool()
+	actualMp = newMemorypool()
 )
 
+// TestNewMemorypool ensures that actualMp and its parts are not nil
 func TestNewMemorypool(t *testing.T) {
 	assert.NotNil(t, actualMp)
 	assert.NotNil(t, actualMp.mapping)
 	assert.NotNil(t, actualMp.mapping["error"])
 }
 
+// TestWrite ensures that actualWrittenURLs and expectedMap are equal
 func TestWrite(t *testing.T) {
 	actualWrittenURLs := actualMp.write(testURLs)
 	assert.Nil(t, actualWrittenURLs)
@@ -32,6 +34,7 @@ func TestWrite(t *testing.T) {
 	assert.Equal(t, expectedMap, actualMp.mapping)
 }
 
+// TestGetPaths ensures that actualPaths is equal to expectedPaths
 func TestGetPaths(t *testing.T) {
 	actualMp.write(testURLs)
 
