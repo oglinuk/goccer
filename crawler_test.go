@@ -19,12 +19,9 @@ var (
 	c = NewCrawler()
 )
 
+// TestNewCrawler checks to make sure the crawler is not nil and if it is
+// equal to the expectedClient
 func TestNewCrawler(t *testing.T) {
-	/*
-	if c == nil {
-		t.Errorf("Expected: crawler; Got: nil")
-	}
-	*/
 	assert.NotNil(t, c)
 
 	expectedClient := &http.Client{
@@ -36,14 +33,10 @@ func TestNewCrawler(t *testing.T) {
 		Timeout: time.Second * 15,
 	}
 
-	/*
-	if !reflect.DeepEqual(c.Client, expectedClient) {
-		t.Errorf("Expected: %v; Got: %v", expectedClient, c.Client)
-	}
-	*/
-	assert.Equal(t, expectedClient, c.Client)
+	assert.Equal(t, expectedClient, c.client)
 }
 
+// TestCrawl checks that err is nil for both "" and expectedSeed
 func TestCrawl(t *testing.T) {
 	_, err := c.Crawl("")
 	assert.Nil(t, err)
@@ -52,29 +45,20 @@ func TestCrawl(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+// TestParseHTML checks that passing nil to c.parseHTML returns nil and
+// that the testHTML file returns 1397 links
 func TestParseHTML(t *testing.T) {
-	assert.Nil(t, c.ParseHTML(nil))
+	assert.Nil(t, c.parseHTML(nil))
 
 	testHTML, err := os.Open(testHTML)
-	/*
-	if err != nil {
-		t.Errorf("Expected: nil; Got: %s", err.Error())
-	}
-	*/
 	assert.Nil(t, err)
 	defer testHTML.Close()
 
-	parsed := c.ParseHTML(testHTML)
-
-	/*
-	expectedLen := 1397
-	if len(parsed) != expectedLen {
-		t.Errorf("Expected: %d; Got: %d", expectedLen, len(parsed))
-	}
-	*/
+	parsed := c.parseHTML(testHTML)
 	assert.Equal(t, 1397, len(parsed))
 }
 
+// TestRebuildURL checks that all hrefs are returned as its expected URL
 func TestRebuildURL(t *testing.T) {
 	hrefs := []string{
 		"https://github.com/afkworks/spec-kn",
@@ -98,15 +82,10 @@ func TestRebuildURL(t *testing.T) {
 	var actualURLs []string
 
 	for _, href := range hrefs {
-		actualURLs = append(actualURLs, c.RebuildURL(href))
+		actualURLs = append(actualURLs, c.rebuildURL(href))
 	}
 
 	for i, URL := range actualURLs {
-		/*
-		if URL != expectedURLs[i] {
-			t.Errorf("\nExpected: %s\nGot: %s", expectedURLs[i], URL)
-		}
-		*/
 		assert.Equal(t, expectedURLs[i], URL)
 	}
 }

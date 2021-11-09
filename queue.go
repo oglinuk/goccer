@@ -7,11 +7,16 @@ import (
 	"syscall"
 )
 
+// job is an array of strings to crawl
 type job struct {
 	paths []string
 }
 
-type workerpool struct {
+// Workerpool is a wrapper for the jobs chan to send seeds, the wg
+// sync.WaitGroup to wait for goroutines, the w(riter) which is an
+// in-memory implementation (only at the moment, see TODO above crawler),
+// the (c)rawler, and a mu(tex) to prevent concurrent map writes
+type Workerpool struct {
 	jobs chan job
 	wg *sync.WaitGroup
 	w *memoryPool
@@ -19,8 +24,9 @@ type workerpool struct {
 	mu *sync.Mutex
 }
 
+// init to set the ulimit to max
+// TODO: Find out if this is the correct place to do it
 func init() {
-	// Set the ulimit to max
 	var rLimit syscall.Rlimit
 	syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
 	rLimit.Cur = rLimit.Max
@@ -44,6 +50,8 @@ func NewWorkerpool() *workerpool {
 	return wp
 }
 
+// consume crawls any job.paths sent over the jobs chan, then writes the
+// collected to whatever wp.w is (in-memory in this case)
 func (wp *workerpool) consume() {
 	for {
 		select {
