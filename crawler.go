@@ -104,7 +104,7 @@ func (c *crawler) rebuildURL(href string) string {
 	// if we get to this point, rebuild using c.seed and href
 	if rebuilt == "" {
 		if strings.HasPrefix(href, "//") {
-			rebuilt = fmt.Sprintf("https:%s", href)
+			rebuilt = fmt.Sprintf("http:%s", href)
 		} else if strings.HasPrefix(href, "/") || strings.HasPrefix(href, "#") {
 			rebuilt = fmt.Sprintf("%s%s", c.seed, href)
 		} else {
