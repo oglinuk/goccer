@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-go build
-./file $1
+main() {
+	go build
+	./file -sf $1
+}
+
+main $*
